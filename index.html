@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星火聊天室 · 腾讯云版</title>
+<style>
+/* ==================== 样式：前端同学负责这一段 ==================== */
+:root{
+  --primary:#6d5efc;--primary2:#5a49f0;--soft:#efecff;--bg:#f5f6fb;
+  --card:#fff;--text:#1f2333;--muted:#8b90a5;--border:#e6e8f0;
+  --ai:#f0edff;--danger:#e25656;--ok:#38b97f;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea{font-family:inherit}
+
+/* 入口页 */
+.entry{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(circle at 18% 12%,#e9e5ff 0%,transparent 42%),
+             radial-gradient(circle at 85% 88%,#dfefff 0%,transparent 42%),var(--bg)}
+.card{width:100%;max-width:430px;background:var(--card);border:1px solid var(--border);
+  border-radius:22px;padding:40px 38px 30px;box-shadow:0 24px 60px rgba(70,55,140,.14)}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.logo{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,#8b7cff,#5a49f0);
+  color:#fff;font-size:27px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 20px rgba(109,94,252,.38)}
+.logo.sm{width:38px;height:38px;font-size:20px;border-radius:12px}
+.bname{font-size:21px;font-weight:750;letter-spacing:.3px}
+.bsub{font-size:12px;color:var(--muted);margin-top:3px}
+.intro{font-size:13px;color:var(--muted);line-height:1.7;margin:22px 0 20px}
+.field-label{display:block;font-size:13px;color:var(--muted);margin:0 0 8px;font-weight:600}
+.nick-input{width:100%;padding:14px 15px;border:1px solid var(--border);border-radius:12px;
+  font-size:15px;outline:none;background:#fbfbfe;transition:.18s}
+.nick-input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px var(--soft)}
+.err{color:var(--danger);font-size:13px;min-height:18px;margin-top:9px}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:650;
+  cursor:pointer;background:linear-gradient(135deg,#7c6cff,#5a49f0);box-shadow:0 8px 20px rgba(109,94,252,.32);transition:.18s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(109,94,252,.42)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.foot{margin-top:20px;text-align:center;font-size:12px;color:var(--muted);line-height:1.7}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--ok)}
+.switch-line{margin-top:18px;text-align:center;font-size:13px;color:var(--muted)}
+.switch-line a{color:var(--primary);font-weight:650;text-decoration:none;cursor:pointer}
+.switch-line a:hover{text-decoration:underline}
+
+/* 聊天页 */
+.chat{display:flex;height:100vh}
+.side{width:256px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:18px 16px}
+.side-head{display:flex;align-items:center;gap:12px;padding:4px 4px 20px}
+.sec-label{font-size:11px;color:var(--muted);margin:16px 6px 8px;letter-spacing:.5px;font-weight:600}
+.me{display:flex;align-items:center;gap:10px;padding:10px;background:#f7f7fc;border-radius:12px}
+.avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#8b7cff,#6352f5);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:15px}
+.me-name{font-size:14px;font-weight:700}
+.me-id{font-size:11px;color:var(--muted);margin-top:2px}
+.nav{width:100%;text-align:left;padding:11px 12px;border:none;border-radius:10px;background:transparent;
+  color:var(--text);font-size:14px;cursor:pointer;margin-bottom:4px;transition:.15s}
+.nav:hover{background:#f5f5fa}
+.nav.active{background:var(--soft);color:var(--primary);font-weight:650}
+.nav.ai{color:var(--primary)}
+.side-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+.btn-quiet{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;
+  color:var(--muted);cursor:pointer;font-size:13px;transition:.15s}
+.btn-quiet:hover{color:var(--danger);border-color:var(--danger)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.head{height:72px;flex-shrink:0;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.title{font-size:17px;font-weight:750}
+.desc{display:none;font-size:12px;color:var(--muted);margin-top:3px}
+.badge{font-size:12px;padding:6px 12px;border-radius:20px;font-weight:650;
+  color:var(--primary);background:var(--soft)}
+.badge.local{color:#b8860b;background:#fff6e0}
+.msgs{flex:1;overflow-y:auto;padding:24px 28px}
+.msg{display:flex;margin-bottom:18px;gap:10px}
+.msg.mine{flex-direction:row-reverse}
+.mav{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:#e9eaf2;color:#666;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.msg.mine .mav,.msg.ai .mav{background:linear-gradient(135deg,#8b7cff,#6352f5);color:#fff}
+.body{max-width:66%}
+.meta{font-size:11px;color:var(--muted);margin-bottom:5px}
+.msg.mine .meta{text-align:right}
+.bubble{padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.6;background:var(--card);
+  border:1px solid var(--border);white-space:pre-wrap;word-break:break-word}
+.msg.mine .bubble{background:var(--primary);color:#fff;border-color:var(--primary)}
+.msg.ai .bubble{background:var(--ai);border-color:#ddd6ff}
+.del{border:none;background:transparent;color:#bbb;font-size:11px;cursor:pointer;margin-left:6px}
+.del:hover{color:var(--danger)}
+.empty{text-align:center;color:var(--muted);font-size:14px;padding:60px 0}
+/* 数据库视图 */
+.dbwrap{padding:4px 0 20px}
+.dbinfo{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7}
+.dbinfo b{color:var(--primary)}
+.dbtab{width:100%;border-collapse:collapse;font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.dbtab th,.dbtab td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);word-break:break-all;vertical-align:top}
+.dbtab th{background:#f7f7fc;color:var(--muted);font-weight:650;white-space:nowrap}
+.dbtab tr:last-child td{border-bottom:none}
+.dbtab .k{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:650;background:var(--soft);color:var(--primary)}
+.dbtab .k.system{background:#fff6e0;color:#b8860b}
+.dbtab .k.ai{background:#e6f7ef;color:#2a9d6a}
+.dbtab .mono{font-family:Consolas,Monaco,monospace;font-size:11px;color:#5a5f75}
+.composer{flex-shrink:0;background:var(--card);border-top:1px solid var(--border);padding:14px 28px 18px}
+.tip{font-size:12px;color:var(--danger);min-height:16px;margin-bottom:4px}
+.crow{display:flex;gap:12px;align-items:flex-end}
+#input{flex:1;resize:none;border:1px solid var(--border);border-radius:12px;padding:12px 14px;
+  font-size:14px;outline:none;max-height:120px;line-height:1.5;transition:.15s}
+#input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--soft)}
+.send{padding:12px 24px;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:650;
+  cursor:pointer;height:44px;background:linear-gradient(135deg,#7c6cff,#5a49f0);transition:.15s}
+.send:hover{transform:translateY(-1px)}
+.send:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.imgbtn{flex-shrink:0;height:44px;padding:0 16px;border:1px solid var(--border);border-radius:12px;background:#fff;
+  color:var(--primary);font-size:14px;font-weight:650;cursor:pointer;transition:.15s;white-space:nowrap}
+.imgbtn:hover{background:var(--soft);border-color:var(--primary)}
+.imgbtn:disabled{opacity:.5;cursor:not-allowed}
+/* 图片消息 */
+.bubble.hasimg{padding:6px}
+.bubble img{display:block;max-width:100%;max-height:320px;border-radius:9px;cursor:zoom-in}
+.bubble .img-cap{padding:6px 8px 4px;white-space:pre-wrap;word-break:break-word}
+/* 大图预览 */
+.lightbox{position:fixed;inset:0;z-index:99;background:rgba(18,18,30,.86);display:flex;align-items:center;
+  justify-content:center;flex-direction:column;gap:14px;padding:24px;cursor:zoom-out}
+.lightbox img{max-width:94vw;max-height:84vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.45);cursor:default}
+.lightbox .lbtip{color:#fff;font-size:13px;opacity:.8}
+
+/* ===== 工具栏（图片 / 文件 / 语音） ===== */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.toolbar .imgbtn{height:34px;padding:0 12px;font-size:13px;border-radius:9px}
+.imgbtn.on{background:var(--danger);border-color:var(--danger);color:#fff}
+.rec-hint{font-size:12px;color:var(--danger);font-weight:650}
+.rec-hint:before{content:"●";margin-right:5px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+
+/* ===== 文件消息卡片 ===== */
+.bubble.hasatt{padding:8px}
+.file-card{display:flex;align-items:center;gap:11px;min-width:210px;max-width:300px;
+  background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.msg.mine .file-card{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);color:#fff}
+.file-ico{width:38px;height:38px;flex-shrink:0;border-radius:9px;background:var(--soft);color:var(--primary);
+  display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.msg.mine .file-ico{background:rgba(255,255,255,.25);color:#fff}
+.file-meta{min-width:0;flex:1}
+.file-name{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-size{font-size:11px;opacity:.72;margin-top:3px}
+.file-dl{flex-shrink:0;border:none;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:650;cursor:pointer;
+  background:var(--primary);color:#fff;text-decoration:none}
+.file-dl:hover{filter:brightness(1.08)}
+.msg.mine .file-dl{background:#fff;color:var(--primary)}
+
+/* ===== 语音消息 ===== */
+.voice-card{display:flex;align-items:center;gap:10px;min-width:190px}
+.voice-play{width:38px;height:38px;flex-shrink:0;border:none;border-radius:50%;cursor:pointer;
+  background:var(--soft);color:var(--primary);font-size:15px;display:flex;align-items:center;justify-content:center}
+.msg.mine .voice-play{background:rgba(255,255,255,.25);color:#fff}
+.voice-track{flex:1;min-width:70px}
+.voice-bars{display:flex;align-items:center;gap:2px;height:20px}
+.voice-bars i{display:block;width:3px;border-radius:2px;background:var(--primary);opacity:.75}
+.msg.mine .voice-bars i{background:#fff}
+.voice-time{font-size:11px;opacity:.75;margin-top:3px}
+
+/* ===== 好友 / 私聊 视图 ===== */
+.frwrap{max-width:640px;padding:4px 0 24px}
+.fr-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.fr-tab{padding:9px 16px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--muted);
+  font-size:13px;font-weight:650;cursor:pointer;transition:.15s}
+.fr-tab:hover{border-color:var(--primary);color:var(--primary)}
+.fr-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.fr-tab .cnt{display:inline-block;min-width:17px;padding:0 5px;margin-left:5px;border-radius:9px;
+  background:var(--danger);color:#fff;font-size:11px;line-height:17px;text-align:center}
+.fr-tab.active .cnt{background:#fff;color:var(--danger)}
+.fr-search{display:flex;gap:8px;margin-bottom:16px}
+.fr-search input{flex:1;padding:11px 13px;border:1px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:#fbfbfe}
+.fr-search input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px var(--soft)}
+.fr-search button{padding:0 18px;border:none;border-radius:10px;background:var(--primary);color:#fff;
+  font-size:13px;font-weight:650;cursor:pointer;white-space:nowrap}
+.fr-sec{font-size:12px;color:var(--muted);font-weight:650;margin:18px 0 10px;letter-spacing:.4px}
+.fr-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--border);
+  border-radius:12px;margin-bottom:9px}
+.fr-av{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#8b7cff,#6352f5);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.fr-info{flex:1;min-width:0}
+.fr-nm{font-size:14px;font-weight:650}
+.fr-id{font-size:11px;color:var(--muted);margin-top:2px;word-break:break-all}
+.fr-ops{display:flex;gap:7px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.fr-btn{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--muted);
+  font-size:12px;font-weight:650;cursor:pointer;white-space:nowrap}
+.fr-btn.pri{background:var(--primary);border-color:var(--primary);color:#fff}
+.fr-btn.ok{background:#e6f7ef;border-color:#b7e6cf;color:#2a9d6a}
+.fr-btn.no{border-color:#f3c9c9;color:var(--danger)}
+.fr-btn:hover{filter:brightness(.98)}
+.fr-empty{text-align:center;color:var(--muted);font-size:13px;padding:34px 0}
+.fr-note{font-size:12px;color:var(--muted);line-height:1.7;background:#f7f7fc;border:1px dashed var(--border);
+  border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.pm-badge{font-size:11px;padding:3px 8px;border-radius:8px;background:var(--soft);color:var(--primary);margin-left:8px;font-weight:650}
+
+@media(max-width:720px){.side{width:64px;padding:12px 6px}.sec-label,.me>div:not(.avatar),.nav,.btn-quiet{font-size:0}
+  .nav{text-align:center}.head,.msgs,.composer{padding-left:14px;padding-right:14px}.body{max-width:84%}
+  .imgbtn{padding:0 11px;font-size:13px}.toolbar{gap:6px}.toolbar .imgbtn{padding:0 9px;font-size:12px}
+  .fr-ops{flex-direction:column}}
+</style>
+<script>
+/* 如需接云端：把下面 env 改成你的腾讯云环境 ID；留空 = 本地存储模式（也能完整体验） */
+window.CHAT_CONFIG = {
+  env: '',                 // 例：'chatroom-1g8abcd1234'
+  collection: 'chat_messages',
+  rateWindowMs: 60000,     // 限流窗口：60 秒
+  rateMax: 8,              // 限流：每窗口最多 8 条
+  pollMs: 2500,            // 刷新间隔
+  aiProxyUrl: 'https://slim-galliform-d1gct7tprfa85b9d8-1523303148.ap-shanghai.app.tcloudbase.com/aiProxy', // 云函数 HTTP 访问地址；留空 = 只用本地规则（离线可演示）
+  aiTimeoutMs: 40000,      // 等待 AI 回复的最长时间（毫秒）
+  maxFileBytes: 512*1024,  // 单个附件上限（本地存储容量有限，云端可放宽）
+  maxVoiceSec: 60          // 单次录音最长秒数
+};
+</script>
+</head>
+<body>
+
+<!-- ==================== 登录 / 注册界面 ==================== -->
+<div id="entry" class="entry">
+  <div class="card">
+    <div class="brand"><div class="logo">✦</div><div>
+      <div class="bname">星火聊天室</div><div class="bsub">登录后进入 · 账号级隔离</div>
+    </div></div>
+
+    <!-- 登录视图 -->
+    <div id="loginView">
+      <p class="intro">已有账号？输入账号密码登录，进入群聊。<br>还能点左侧「小星」提问，或发图片 / 文件 / 语音。</p>
+      <label class="field-label" for="loginUser">账号</label>
+      <input id="loginUser" class="nick-input" type="text" placeholder="例如：xiaoming" maxlength="24" autocomplete="username">
+      <label class="field-label" for="loginPass" style="margin-top:14px">密码</label>
+      <input id="loginPass" class="nick-input" type="password" placeholder="至少 4 位" autocomplete="current-password">
+      <div id="entryErr" class="err"></div>
+      <button id="btnEnter" class="btn">登录并进入</button>
+      <div class="switch-line">还没有账号？<a id="goRegister">立即注册</a></div>
+    </div>
+
+    <!-- 注册视图 -->
+    <div id="regView" style="display:none">
+      <p class="intro">创建一个新账号，注册后自动进入群聊。<br>账号密码保存在本机，可跨刷新使用。</p>
+      <label class="field-label" for="regUser">账号</label>
+      <input id="regUser" class="nick-input" type="text" placeholder="例如：xiaoming" maxlength="24" autocomplete="username">
+      <label class="field-label" for="regPass" style="margin-top:14px">密码</label>
+      <input id="regPass" class="nick-input" type="password" placeholder="至少 4 位" autocomplete="new-password">
+      <label class="field-label" for="regPass2" style="margin-top:14px">确认密码</label>
+      <input id="regPass2" class="nick-input" type="password" placeholder="再输入一次密码" autocomplete="new-password">
+      <label class="field-label" for="regNick" style="margin-top:14px">昵称（选填，群聊显示名）</label>
+      <input id="regNick" class="nick-input" type="text" placeholder="默认同账号" maxlength="20">
+      <div id="regErr" class="err"></div>
+      <button id="btnRegister" class="btn">注册并进入</button>
+      <div class="switch-line">已有账号？<a id="goLogin">返回登录</a></div>
+    </div>
+
+    <div class="foot"><span class="dot"></span><span id="modeText">正在检测运行模式…</span></div>
+  </div>
+</div>
+
+<!-- ==================== 聊天室 ==================== -->
+<div id="chat" class="chat" style="display:none">
+  <aside class="side">
+    <div class="side-head"><div class="logo sm">✦</div><div>
+      <div class="bname" style="font-size:16px">星火聊天室</div><div class="bsub">群聊 · 腾讯云版</div>
+    </div></div>
+    <div class="sec-label">当前身份</div>
+    <div class="me"><div class="avatar" id="meAvatar">我</div><div>
+      <div class="me-name" id="meName">—</div><div class="me-id" id="meId">—</div>
+    </div></div>
+    <div class="sec-label">视图</div>
+    <button class="nav active" id="navAll">🌐 群聊大厅</button>
+    <button class="nav" id="navMine">🔒 个人</button>
+    <div class="sec-label">智能助手</div>
+    <button class="nav ai" id="navAi" title="点一下自动 @小星 并发送">✦ 小星 · @ 它接话</button>
+    <div class="sec-label">社交</div>
+    <button class="nav" id="navFriends">👥 好友</button>
+    <button class="nav" id="navPm" style="display:none">💬 私聊</button>
+    <div class="sec-label">数据</div>
+    <button class="nav" id="navDb">🗄 数据库</button>
+    <div class="side-foot"><button class="btn-quiet" id="btnExit">退出</button></div>
+  </aside>
+  <main class="main">
+    <header class="head"><div>
+      <div class="title" id="chatTitle">群聊大厅</div>
+      <div class="desc" id="chatDesc"></div>
+    </div><div class="badge" id="badge">检测中</div></header>
+    <div class="msgs" id="msgs"></div>
+    <div class="composer">
+      <div class="tip" id="tip"></div>
+      <div class="toolbar">
+        <button class="imgbtn" id="btnImg" title="发送图片（自动压缩）">🖼 图片</button>
+        <button class="imgbtn" id="btnFile" title="上传任意文件（本地演示建议小于 500KB）">📎 文件</button>
+        <button class="imgbtn" id="btnVoice" title="录音发语音；不支持时可选择音频文件">🎤 语音</button>
+        <span class="rec-hint" id="recHint" style="display:none">录音中 0s · 再点停止发送</span>
+      </div>
+      <div class="crow">
+        <textarea id="input" rows="1" placeholder="输入消息… 带 @小星 发给小星接话；普通消息直接群聊（Enter 发送）"></textarea>
+        <button class="send" id="btnSend">发送</button>
+      </div>
+      <input type="file" id="fileImg" accept="image/*" style="display:none">
+      <input type="file" id="fileAny" style="display:none">
+      <input type="file" id="fileAudio" accept="audio/*" style="display:none">
+    </div>
+  </main>
+</div>
+
+<!-- 图片大图预览 -->
+<div id="lightbox" class="lightbox" style="display:none">
+  <img id="lightboxImg" src="" alt="图片预览">
+  <div class="lbtip">点击任意处关闭</div>
+</div>
+
+<script>
+/* ==================================================================
+   星火聊天室 · 单文件版
+   模块顺序：配置(上) → 数据层 STORE → 限流 RATE → 助手 AI → 界面 UI
+   两人分工：前端同学改【样式 + UI】，后端同学改【STORE + RATE + AI + 配置】
+   ================================================================== */
+(function(){
+'use strict';
+var CFG = window.CHAT_CONFIG;
+var $ = function(id){ return document.getElementById(id); };
+
+/* ===== 工具 ===== */
+function uid(){ return 'u_' + Math.random().toString(36).slice(2,10); }
+function idFromName(name){ var h=0; for(var i=0;i<name.length;i++){h=((h<<5)-h+name.charCodeAt(i))|0;} return 'u_'+Math.abs(h).toString(36); }
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function nowISO(){ return new Date().toISOString(); }
+function hhmm(iso){ try{ var d=new Date(iso); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }catch(e){ return ''; } }
+
+/* 图片工具 IMG：读取文件 → canvas 压缩 → dataURL。只产出 data:image/ 前缀，供渲染层安全校验 */
+var IMG = {
+  MAX_SIDE: 1280,   // 压缩后最长边
+  QUALITY: 0.78,    // JPEG 质量
+  // file -> Promise<{dataURL,w,h,bytes}>；自动按比例缩放、白底合成避免透明 PNG 变黑
+  read:function(file){
+    return new Promise(function(resolve,reject){
+      if(!file || !/^image\//i.test(file.type)){ reject(new Error('请选择图片文件（JPG/PNG/GIF/WebP）')); return; }
+      var fr=new FileReader();
+      fr.onerror=function(){ reject(new Error('读取图片失败')); };
+      fr.onload=function(){
+        var im=new Image();
+        im.onerror=function(){ reject(new Error('图片解析失败，换一张试试')); };
+        im.onload=function(){
+          try{
+            var w=im.naturalWidth||im.width, h=im.naturalHeight||im.height;
+            if(!w||!h) throw new Error('图片尺寸异常');
+            var scale=Math.min(1, IMG.MAX_SIDE/Math.max(w,h));
+            var cw=Math.max(1,Math.round(w*scale)), ch=Math.max(1,Math.round(h*scale));
+            var cv=document.createElement('canvas');
+            cv.width=cw; cv.height=ch;
+            var ctx=cv.getContext('2d');
+            ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,cw,ch);
+            ctx.drawImage(im,0,0,cw,ch);
+            var data=cv.toDataURL('image/jpeg', IMG.QUALITY);
+            if(data.indexOf('data:image/')!==0) throw new Error('图片压缩失败');
+            resolve({ dataURL:data, w:cw, h:ch, bytes:Math.round(data.length*0.75) });
+          }catch(e){ reject(e); }
+        };
+        im.src=fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+};
+
+/* 附件工具 FILE：任意文件 → base64 dataURL（带体积保护）。
+   只保存文件名/大小/类型/数据，不做任何执行，下载时用 <a download> 交给浏览器。 */
+var FILE = {
+  LIMIT: function(){ return (CFG.maxFileBytes||512*1024); },
+  read:function(file){
+    return new Promise(function(resolve,reject){
+      if(!file){ reject(new Error('未选择文件')); return; }
+      if(file.size > FILE.LIMIT()){ reject(new Error('文件超过 '+Math.round(FILE.LIMIT()/1024)+'KB 上限，请换小一点的文件')); return; }
+      // 本地/临时存储容量有限，进一步限制，避免把整批消息写爆
+      if(Store.mode!=='cloud' && SafeLS.level()<2 && file.size > 180*1024){
+        reject(new Error('当前浏览器存储受限，请上传 180KB 以内的文件（或填 env 用云端）')); return;
+      }
+      var fr=new FileReader();
+      fr.onerror=function(){ reject(new Error('读取文件失败')); };
+      fr.onload=function(){
+        var d=String(fr.result||'');
+        if(d.indexOf('data:')!==0){ reject(new Error('文件编码失败')); return; }
+        resolve({ name:file.name||'未命名文件', size:file.size||0, type:file.type||'', data:d });
+      };
+      fr.readAsDataURL(file);
+    });
+  },
+  ext:function(name){
+    var m=String(name||'').match(/\.([a-z0-9]{1,5})$/i);
+    return m?m[1].toUpperCase():'文件';
+  },
+  kb:function(n){ n=n||0; return n>=1024*1024 ? (n/1024/1024).toFixed(1)+'MB' : Math.max(1,Math.round(n/1024))+'KB'; }
+};
+
+/* 语音工具 VOICE：MediaRecorder 录音 → base64 dataURL + 时长。
+   预览面板 / 无麦克风权限时会失败，上层降级为「上传音频文件」。 */
+var VOICE = {
+  rec:null, stream:null, chunks:[], t0:0, timer:null, active:false,
+  supported:function(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); },
+  start:function(){
+    var self=this;
+    if(!this.supported()) return Promise.reject(new Error('当前环境不支持录音'));
+    return navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      self.stream=stream; self.chunks=[];
+      var opts = window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? {mimeType:'audio/webm;codecs=opus'} : {};
+      try{ self.rec=new MediaRecorder(stream,opts); }catch(e){ self.rec=new MediaRecorder(stream); }
+      self.rec.ondataavailable=function(e){ if(e.data && e.data.size) self.chunks.push(e.data); };
+      self.rec.start(); self.t0=Date.now(); self.active=true;
+      return true;
+    });
+  },
+  stop:function(){
+    var self=this;
+    if(!this.rec || !this.active) return Promise.reject(new Error('没有正在进行的录音'));
+    return new Promise(function(resolve,reject){
+      self.rec.onstop=function(){
+        var dur=Math.max(1,Math.round((Date.now()-self.t0)/1000));
+        var blob=new Blob(self.chunks,{type:self.rec.mimeType||'audio/webm'});
+        var mime=blob.type||'audio/webm';
+        var fr=new FileReader();
+        fr.onerror=function(){ reject(new Error('音频编码失败')); };
+        fr.onload=function(){ resolve({ data:String(fr.result||''), dur:dur, mime:mime, bytes:blob.size }); };
+        fr.readAsDataURL(blob);
+        self.cleanup();
+      };
+      try{ self.rec.stop(); }catch(e){ self.cleanup(); reject(e); }
+    });
+  },
+  cancel:function(){ try{ if(this.rec && this.active) this.rec.stop(); }catch(e){} this.cleanup(); },
+  cleanup:function(){
+    this.active=false;
+    if(this.timer){ clearInterval(this.timer); this.timer=null; }
+    if(this.stream){ try{ this.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} }
+    this.stream=null; this.rec=null; this.chunks=[];
+  }
+};
+
+/* 安全存储：localStorage → sessionStorage → Cookie → window.name → 内存 依次降级。
+   预览面板常禁用 localStorage，window.name 在同一标签页刷新后仍保留，尽量让账号/消息刷新不丢。 */
+var SafeLS = (function(){
+  var bag = {}, backend = 'memory', active = null;
+  var P = 'spark_chat_'; // 本程序占用的键前缀，保存时先清掉旧键再写入，保证删除同步生效
+  var C = [
+    { name:'local', level:2,
+      available:function(){ var s=window.localStorage; if(!s) return false; try{ s.setItem('__sp','1'); s.removeItem('__sp'); return true; }catch(e){ return false; } },
+      load:function(){ var s=window.localStorage, m={}; for(var i=0;i<s.length;i++){ var k=s.key(i); if(k.indexOf(P)===0) m[k]=s.getItem(k); } return m; },
+      save:function(m){ var s=window.localStorage, d=[]; for(var i=0;i<s.length;i++){ var k=s.key(i); if(k.indexOf(P)===0) d.push(k); } d.forEach(function(k){ s.removeItem(k); }); Object.keys(m).forEach(function(k){ s.setItem(k,m[k]); }); } },
+    { name:'session', level:2,
+      available:function(){ var s=window.sessionStorage; if(!s) return false; try{ s.setItem('__sp','1'); s.removeItem('__sp'); return true; }catch(e){ return false; } },
+      load:function(){ var s=window.sessionStorage, m={}; for(var i=0;i<s.length;i++){ var k=s.key(i); if(k.indexOf(P)===0) m[k]=s.getItem(k); } return m; },
+      save:function(m){ var s=window.sessionStorage, d=[]; for(var i=0;i<s.length;i++){ var k=s.key(i); if(k.indexOf(P)===0) d.push(k); } d.forEach(function(k){ s.removeItem(k); }); Object.keys(m).forEach(function(k){ s.setItem(k,m[k]); }); } },
+    { name:'cookie', level:2,
+      available:function(){ try{ document.cookie='__sp=1; path=/'; var ok=document.cookie.indexOf('__sp=1')>=0; document.cookie='__sp=; path=/; max-age=0'; return ok; }catch(e){ return false; } },
+      load:function(){ var m={}; (document.cookie||'').split(';').forEach(function(c){ var p=c.indexOf('='); if(p<0) return; var k=decodeURIComponent(c.slice(0,p).trim()); if(k.indexOf('sp_')===0) m[k.slice(3)]=decodeURIComponent(c.slice(p+1)); }); return m; },
+      save:function(m){ (document.cookie||'').split(';').forEach(function(c){ var p=c.indexOf('='); if(p<0) return; var k=decodeURIComponent(c.slice(0,p).trim()); if(k.indexOf('sp_')===0) document.cookie=k+'=; path=/; max-age=0'; }); Object.keys(m).forEach(function(k){ document.cookie='sp_'+encodeURIComponent(k)+'='+encodeURIComponent(m[k])+'; path=/; max-age=31536000'; }); } },
+    { name:'name', level:1,
+      available:function(){ return true; },
+      load:function(){ try{ return JSON.parse(window.name||'{}')||{}; }catch(e){ return {}; } },
+      save:function(m){ window.name=JSON.stringify(m); } }
+  ];
+  for(var i=0;i<C.length;i++){
+    if(C[i].available && !C[i].available()) continue;
+    try{ bag=C[i].load(); active=C[i]; backend=C[i].name; break; }catch(e){}
+  }
+  function persist(){ if(!active) return; try{ active.save(bag); }catch(e){ active=null; backend='memory'; } }
+  return {
+    backend:function(){ return backend; },
+    level:function(){ return active?active.level:0; },
+    getItem:function(k){ return (k in bag)?bag[k]:null; },
+    setItem:function(k,v){ bag[k]=String(v); persist(); },
+    removeItem:function(k){ delete bag[k]; persist(); }
+  };
+})();
+
+/* ===== 账号 AUTH：本地账号表 + 哈希密码（独立注册 + 登录校验） ===== */
+var Auth = {
+  LS_USERS:'spark_chat_users_v1',
+  hash:function(s){ var h=5381,i; s='sp@'+String(s); for(i=0;i<s.length;i++){ h=((h<<5)+h+s.charCodeAt(i))>>>0; } return 'h'+h.toString(36); },
+  users:function(){ var u={}; try{ u=JSON.parse(SafeLS.getItem(this.LS_USERS)||'{}')||{}; }catch(e){} return u; },
+  register:function(account, password, nickname){
+    var u=this.users(), key=account.toLowerCase();
+    if(u[key]) return { ok:false, error:'该账号已存在，请直接登录' };
+    // 云端模式：账号目录已同步，别的设备注册过的账号不能重复注册
+    if(Store.mode==='cloud' && CloudSync.profiles[key]) return { ok:false, error:'该账号已在云端存在，请直接登录' };
+    var rec={ pass:this.hash(password), nickname:nickname||account, createdAt:nowISO() };
+    u[key]=rec;
+    SafeLS.setItem(this.LS_USERS, JSON.stringify(u));
+    if(Store.mode==='cloud')
+      CloudSync.publishProfile({ uid:key, username:account, nickname:rec.nickname, pass:rec.pass, createdAt:rec.createdAt });
+    return { ok:true, me:{ id:idFromName(key), username:key, uid:key, nickname:rec.nickname } };
+  },
+  login:function(account, password){
+    var u=this.users(), key=account.toLowerCase(), ph=this.hash(password);
+    // 云端模式：本机没有这个账号时，用云端目录校验（别的设备注册的账号也能登录）
+    if(!u[key] && Store.mode==='cloud'){
+      var p=CloudSync.profiles[key];
+      if(p && p.pass===ph){
+        u[key]={ pass:p.pass, nickname:p.nickname||key, createdAt:p.createdAt||nowISO() };
+        SafeLS.setItem(this.LS_USERS, JSON.stringify(u));   // 缓存到本机，下次免查云端
+        return { ok:true, me:{ id:idFromName(key), username:key, uid:key, nickname:u[key].nickname } };
+      }
+    }
+    if(!u[key]) return { ok:false, error:'账号不存在，请先注册' };
+    if(u[key].pass!==ph) return { ok:false, error:'密码错误，请重试' };
+    return { ok:true, me:{ id:idFromName(key), username:key, uid:key, nickname:u[key].nickname } };
+  },
+  // 用户目录：本机账号 +（云端模式）云端账号目录，供搜索加好友（不暴露密码）
+  directory:function(){
+    var u=this.users(), out=[], seen={};
+    Object.keys(u).forEach(function(k){
+      seen[k]=true;
+      out.push({ uid:k, username:k, nickname:u[k].nickname||k, createdAt:u[k].createdAt||'' });
+    });
+    if(Store.mode==='cloud'){
+      Object.keys(CloudSync.profiles).forEach(function(k){
+        if(seen[k]) return;
+        var p=CloudSync.profiles[k];
+        out.push({ uid:k, username:k, nickname:p.nickname||k, createdAt:p.createdAt||'' });
+      });
+    }
+    return out;
+  }
+};
+
+/* ===== 社交 SOCIAL：好友申请 + 好友关系（本地存储） =====
+   关系用稳定的账号 uid 标识，与消息 ownerId 解耦，避免大小写/历史数据导致串号。
+   requests: [{id, from, fromName, to, toName, status, createdAt}]  status: pending/accepted/rejected
+   friends : [{a, b, aName, bName, createdAt}]  —— 成对保存，双方便于查询 */
+var Social = {
+  LS:'spark_chat_social_v1',
+  data:function(){
+    // 云端模式：以云端事件流重放出来的状态为准，两台设备看到同一份好友关系
+    if(Store.mode==='cloud') return CloudSync.state();
+    var d={requests:[],friends:[]};
+    try{ var x=JSON.parse(SafeLS.getItem(this.LS)||'{}')||{};
+      d.requests=Array.isArray(x.requests)?x.requests:[];
+      d.friends=Array.isArray(x.friends)?x.friends:[];
+    }catch(e){}
+    return d;
+  },
+  save:function(d){ SafeLS.setItem(this.LS, JSON.stringify(d)); },
+  pendingRequest:function(from,to){
+    return this.data().requests.filter(function(r){ return r.from===from && r.to===to && r.status==='pending'; })[0];
+  },
+  isFriend:function(a,b){
+    return this.data().friends.some(function(f){ return (f.a===a&&f.b===b)||(f.a===b&&f.b===a); });
+  },
+  request:function(me, peer){
+    var d=this.data(), meU=me.uid, peerU=peer.uid;
+    if(meU===peerU) return {ok:false,error:'不能加自己为好友'};
+    if(this.isFriend(meU,peerU)) return {ok:false,error:'对方已经是你的好友了'};
+    if(this.pendingRequest(meU,peerU)) return {ok:false,error:'申请已发出，等待对方同意'};
+    // 对方已向我发过申请 → 直接互相成为好友（避免两边各点一次）
+    var reverse=d.requests.filter(function(r){ return r.from===peerU && r.to===meU && r.status==='pending'; })[0];
+    if(Store.mode==='cloud'){
+      // 追加事件而不是改整份数据，两台设备并发写也不会互相覆盖
+      if(reverse) CloudSync.push({act:'accept', reqId:reverse.id, from:meU, to:reverse.from});
+      else CloudSync.push({act:'request', reqId:uid(), from:meU, fromName:me.nickname, to:peerU, toName:peer.nickname});
+      return {ok:true, auto:!!reverse};
+    }
+    if(reverse){
+      reverse.status='accepted';
+      d.friends.push({a:reverse.from,b:reverse.to,aName:reverse.fromName,bName:reverse.toName,createdAt:nowISO()});
+      this.save(d);
+      return {ok:true,auto:true};
+    }
+    d.requests.push({ id:uid(), from:meU, fromName:me.nickname, to:peerU, toName:peer.nickname,
+      status:'pending', createdAt:nowISO() });
+    this.save(d);
+    return {ok:true};
+  },
+  respond:function(reqId, me, accept){
+    var d=this.data(), r=d.requests.filter(function(x){ return x.id===reqId && x.to===me.uid; })[0];
+    if(!r) return {ok:false,error:'申请不存在或不是发给你的'};
+    if(Store.mode==='cloud'){
+      CloudSync.push({act: accept?'accept':'reject', reqId:reqId, from:me.uid, to:r.from});
+      return {ok:true};
+    }
+    r.status = accept?'accepted':'rejected';
+    if(accept && !this.isFriend(r.from,r.to)){
+      d.friends.push({a:r.from,b:r.to,aName:r.fromName,bName:r.toName,createdAt:nowISO()});
+    }
+    this.save(d);
+    return {ok:true};
+  },
+  remove:function(me, peerUid){
+    var meU=me.uid;
+    if(Store.mode==='cloud'){
+      CloudSync.push({act:'remove', a:meU, b:peerUid});
+      return {ok:true};
+    }
+    var d=this.data();
+    d.friends=d.friends.filter(function(f){ return !((f.a===meU&&f.b===peerUid)||(f.a===peerUid&&f.b===meU)); });
+    d.requests=d.requests.filter(function(r){ return !((r.from===meU&&r.to===peerUid)||(r.from===peerUid&&r.to===meU)); });
+    this.save(d);
+    return {ok:true};
+  },
+  // 我的好友 -> [{uid,nickname}]
+  friendsOf:function(me){
+    var meU=me.uid;
+    return this.data().friends.filter(function(f){ return f.a===meU||f.b===meU; }).map(function(f){
+      return f.a===meU ? {uid:f.b,nickname:f.bName||f.b} : {uid:f.a,nickname:f.aName||f.a};
+    });
+  },
+  incoming:function(me){ return this.data().requests.filter(function(r){ return r.to===me.uid && r.status==='pending'; }); },
+  outgoing:function(me){ return this.data().requests.filter(function(r){ return r.from===me.uid && r.status==='pending'; }); }
+};
+
+/* ===== 数据层 STORE：云端 / 本地 双模式 ===== */
+var Store = {
+  mode:'local', db:null, app:null, _queue:Promise.resolve(),
+  LS_MSG:'spark_chat_messages_v1', LS_RATE:'spark_chat_rate_v1',
+  init:function(){
+    var self=this;
+    if(CFG.env && typeof window.cloudbase!=='undefined'){
+      try{
+        self.app = cloudbase.init({ env: CFG.env });
+        var auth = self.app.auth({ persistence:'local' });
+        return Promise.resolve(auth.getLoginState && auth.getLoginState())
+          .then(function(state){ if(!state) return auth.signInAnonymously(); })
+          .then(function(){ self.db=self.app.database(); self.mode='cloud'; })
+          .catch(function(e){ console.warn('云模式失败，降级本地：',e); self.mode='local'; });
+      }catch(e){ console.warn('云 SDK 异常，降级本地：',e); self.mode='local'; }
+    }
+    self.mode='local';
+    return Promise.resolve();
+  },
+  list:function(){
+    if(this.mode==='cloud'){
+      return this.db.collection(CFG.collection).orderBy('createdAt','asc').limit(1000).get()
+        .then(function(r){ return r.data||[]; })
+        .catch(function(e){ console.warn('读取云端失败',e); return []; });
+    }
+    var a=[]; try{ a=JSON.parse(SafeLS.getItem(this.LS_MSG)||'[]'); }catch(e){}
+    return Promise.resolve(a);
+  },
+  add:function(msg){
+    if(this.mode==='cloud') return this.db.collection(CFG.collection).add(msg);
+    var self=this;
+    // 串行写入，避免同时 add（欢迎语 + 首条消息）互相覆盖导致消息丢失
+    var task = this._queue.then(function(){
+      return self.list().then(function(a){
+        a.push(msg); if(a.length>500) a=a.slice(-500);
+        SafeLS.setItem(self.LS_MSG, JSON.stringify(a));
+      });
+    });
+    this._queue = task.catch(function(){});
+    return task;
+  },
+  remove:function(id, ownerId){
+    var self=this;
+    if(this.mode==='cloud'){
+      return this.db.collection(CFG.collection).where({mid:id, ownerId:ownerId}).get()
+        .then(function(r){
+          if(!r.data||!r.data.length) throw new Error('只能删除自己的消息');
+          return self.db.collection(CFG.collection).doc(r.data[0]._id).remove();
+        });
+    }
+    return this.list().then(function(a){
+      a=a.filter(function(m){ return !(m.mid===id && m.ownerId===ownerId); });
+      SafeLS.setItem(self.LS_MSG, JSON.stringify(a));
+    });
+  }
+};
+
+/* ===== 云端同步 CloudSync：账号目录 + 好友关系上云 =====
+   只在云端模式生效；本地模式完全不走这里，行为保持不变。
+   复用同一个 chat_messages 集合，不需要在控制台新建集合：
+     kind='profile'  账号目录（uid / nickname / pass 哈希 / createdAt）
+     kind='social'   好友关系事件流（append-only，多设备并发不会互相覆盖）
+   查询函数全部保持同步：由本对象内存缓存供数，refresh() 轮询时从云端吸收最新记录。 */
+var CloudSync = {
+  profiles:{},            // uid -> profile 记录
+  events:{},              // mid -> 云端已确认的 social 事件
+  pending:{},             // mid -> 已提交但云端尚未回读的 social 事件
+  _localPublished:false,
+
+  absorb:function(list){
+    var self=this;
+    (list||[]).forEach(function(m){
+      if(!m) return;
+      if(m.kind==='profile' && m.uid){
+        var old=self.profiles[m.uid];
+        if(!old || String(m.createdAt||'')>=String(old.createdAt||'')) self.profiles[m.uid]=m;
+      }else if(m.kind==='social' && m.mid){
+        self.events[m.mid]=m;
+        delete self.pending[m.mid];   // 云端已回读，撤下待确认标记
+      }
+    });
+  },
+
+  publishProfile:function(rec){
+    var r={ mid:uid(), kind:'profile', uid:rec.uid, username:rec.username||rec.uid,
+      nickname:rec.nickname||rec.uid, pass:rec.pass, createdAt:rec.createdAt||nowISO(),
+      ownerId:'sys', ownerName:'账号目录' };
+    this.profiles[r.uid]=r;
+    Promise.resolve(Store.add(r)).catch(function(e){ console.warn('账号目录上云失败：',e); });
+    return r;
+  },
+
+  // 把「填 env 之前在本机注册过的账号」补进云端目录，保证老账号也能被别的设备搜到
+  publishLocalUsers:function(){
+    if(Store.mode!=='cloud' || this._localPublished) return;
+    this._localPublished=true;
+    var u=Auth.users(), self=this;
+    Object.keys(u).forEach(function(k){
+      if(!self.profiles[k])
+        self.publishProfile({ uid:k, username:k, nickname:u[k].nickname||k,
+          pass:u[k].pass, createdAt:u[k].createdAt });
+    });
+  },
+
+  push:function(act){
+    var e={ mid:uid(), kind:'social', act:act.act, reqId:act.reqId||'',
+      from:act.from||'', fromName:act.fromName||'', to:act.to||'', toName:act.toName||'',
+      a:act.a||'', b:act.b||'', aName:act.aName||'', bName:act.bName||'',
+      createdAt:nowISO(), ownerId:(state.me?state.me.id:'sys'),
+      ownerName:(state.me?state.me.nickname:'系统') };
+    this.pending[e.mid]=e;          // 立即进缓存，本机界面马上能看到结果
+    Promise.resolve(Store.add(e)).catch(function(err){ console.warn('好友关系上云失败：',err); });
+    return e;
+  },
+
+  // 把事件流重放成 {requests, friends}，结构与本地 Social.data() 完全一致
+  state:function(){
+    var all={}, self=this;
+    Object.keys(this.events).forEach(function(k){ all[k]=self.events[k]; });
+    Object.keys(this.pending).forEach(function(k){ if(!all[k]) all[k]=self.pending[k]; });
+    var evs=Object.keys(all).map(function(k){ return all[k]; })
+      .sort(function(x,y){ return String(x.createdAt||'').localeCompare(String(y.createdAt||'')); });
+    var reqs={}, frs={};
+    function pair(a,b){ return a<b ? a+'|'+b : b+'|'+a; }
+    function addFriend(a,b,aName,bName,t){
+      if(!a||!b||a===b) return;
+      frs[pair(a,b)]={a:a,b:b,aName:aName||a,bName:bName||b,createdAt:t||nowISO()};
+    }
+    evs.forEach(function(e){
+      if(e.act==='request'){
+        reqs[e.reqId]={ id:e.reqId, from:e.from, fromName:e.fromName, to:e.to, toName:e.toName,
+          status:'pending', createdAt:e.createdAt };
+      }else if(e.act==='accept'){
+        var r=reqs[e.reqId];
+        if(r){ r.status='accepted'; addFriend(r.from,r.to,r.fromName,r.toName,e.createdAt); }
+      }else if(e.act==='reject'){
+        if(reqs[e.reqId]) reqs[e.reqId].status='rejected';
+      }else if(e.act==='friend'){
+        addFriend(e.a,e.b,e.aName,e.bName,e.createdAt);
+      }else if(e.act==='remove'){
+        delete frs[pair(e.a,e.b)];
+        Object.keys(reqs).forEach(function(id){
+          var r=reqs[id];
+          if((r.from===e.a&&r.to===e.b)||(r.from===e.b&&r.to===e.a)) delete reqs[id];
+        });
+      }
+    });
+    return { requests:Object.keys(reqs).map(function(k){ return reqs[k]; }),
+             friends:Object.keys(frs).map(function(k){ return frs[k]; }) };
+  }
+};
+
+/* ===== 限流 RATE：滑动窗口（每用户 60 秒 8 条） ===== */
+var Rate = {
+  check:function(ownerId){
+    var t=Date.now(), map={};
+    try{ map=JSON.parse(SafeLS.getItem(Store.LS_RATE)||'{}'); }catch(e){}
+    var arr=(map[ownerId]||[]).filter(function(x){ return t-x < CFG.rateWindowMs; });
+    if(arr.length>=CFG.rateMax){
+      return { ok:false, wait:Math.ceil((CFG.rateWindowMs-(t-arr[0]))/1000) };
+    }
+    arr.push(t); map[ownerId]=arr;
+    SafeLS.setItem(Store.LS_RATE, JSON.stringify(map));
+    return { ok:true };
+  }
+};
+
+/* ===== 智能助手 AI：云端扣子优先，本地规则兜底 ===== */
+var AI = {
+  // 本地规则：离线可用 / 云函数未配置或失败时自动降级
+  localAnswer:function(q){
+    var s=String(q||'');
+    if(/你好|hi|hello|在吗/i.test(s)) return '你好！我是小星 ✦ 星火聊天室的智能助手。输入消息就能群聊，问我问题我会尽力回答。';
+    if(/你是谁|介绍|什么功能|能做什么/.test(s))
+      return '我是小星 ✦ 这个聊天室支持：账号注册登录、群聊大厅、发图片/文件/语音、加好友与私聊、「个人」视图、owner_id 归属隔离、60 秒 8 条限流，还有我在线答疑。';
+    if(/文件|上传|附件|语音|录音|好友|私聊|加好友/.test(s))
+      return '工具栏有 🖼图片 / 📎文件 / 🎤语音 三个按钮；侧栏「👥 好友」可以搜索账号、发申请、同意后私聊。私聊消息带 toUid，群聊大厅严格过滤，不会串消息。';
+    if(/架构|技术|前后端|什么语言|怎么实现/.test(s))
+      return '发布到腾讯云开发「网站托管」：前端是原生 HTML/CSS/JS，数据存在云数据库（填 env 后自动切换），未配置环境时自动用浏览器本地存储做演示。';
+    if(/数据库|表|集合|存哪/.test(s))
+      return '云端用云数据库集合 '+CFG.collection+'，每条消息含 mid、ownerId、ownerName、content、kind、createdAt。本地模式数据存在浏览器 localStorage。老师可用数据库工具查看云端集合。';
+    if(/隔离|owner|权限|删除|个人|只看我的/.test(s))
+      return '每条消息都有 ownerId（由账号生成，稳定唯一）。「个人」视图按 ownerId 过滤；删除时服务端/本地都会校验 ownerId，只能删自己的消息。';
+    if(/限流|刷屏|频率/.test(s))
+      return '限流用滑动窗口：每个身份 60 秒内最多 '+CFG.rateMax+' 条，超限会提示还需等待的秒数，前端按钮也会暂时禁用。';
+    if(/域名|发布|上线|网址|腾讯云/.test(s))
+      return '在腾讯云开发控制台开通环境 → 开启匿名登录 → 建 '+CFG.collection+' 集合 → 把 index.html 上传到「网站托管」，系统会分配一个免费域名，老师打开即可使用。';
+    if(/成员|几个人|几个人聊|多人/.test(s))
+      return '这是群聊大厅：所有人看到的消息在同一条时间线上，但每条都标注了 owner_id。发布到云端后，同一网址的不同人就能一起聊。';
+    return '我还在学习中～ 你可以问我：这个项目是什么架构？数据库存哪？owner_id 怎么隔离？怎么限流？怎么发布拿域名？';
+  },
+  // 统一入口：返回 Promise<string>。云端可用时调扣子，否则回退本地规则。
+  // history：最近的对话轮次 [{role:'user'|'assistant', content}]，让扣子"记得"前文
+  answer:function(q, userId, history){
+    var self=this, text=String(q||'');
+    if(!CFG.aiProxyUrl) return Promise.resolve(self.localAnswer(text));
+    var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, CFG.aiTimeoutMs||40000) : null;
+    var opts = {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ question:text, userId:userId||'guest', history:history||[] })
+    };
+    if(ctrl) opts.signal=ctrl.signal;
+    return fetch(CFG.aiProxyUrl, opts)
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d && d.ok && d.answer) return String(d.answer);
+        throw new Error((d && d.error) || '云端未返回答案');
+      })
+      .catch(function(e){
+        console.warn('云端 AI 不可用，降级本地规则：', e && e.message);
+        return self.localAnswer(text);
+      })
+      .then(function(ans){ if(timer) clearTimeout(timer); return ans; });
+  }
+};
+
+/* ===== 界面 UI：前端同学主要负责这一段 ===== */
+var state={ me:null, scope:'all', timer:null, asking:false, composing:false,
+  frTab:'friends', frQuery:'', pmPeer:null, _audio:null, _playBtn:null };
+
+function setModeUI(){
+  var cloud = Store.mode==='cloud';
+  var label = {local:'浏览器本地存储',session:'本次会话存储',cookie:'浏览器 Cookie',name:'标签页临时存储',memory:'内存（刷新会清空）'}[SafeLS.backend()] || '本地存储';
+  $('modeText').textContent = cloud
+    ? '腾讯云数据库模式（消息存云端 · 账号存本机）'
+    : '本地存储模式（账号/消息存在' + label + '，未填环境 ID）';
+  var b=$('badge');
+  b.textContent = cloud ? '☁ 云端数据库' : '💾 本地存储';
+  b.className = 'badge' + (cloud?'':' local');
+}
+
+function enter(me){
+  state.me = me;
+  try{ SafeLS.setItem('spark_chat_me', JSON.stringify(state.me)); }catch(e){}
+  $('entry').style.display='none';
+  $('chat').style.display='flex';
+  $('meName').textContent=me.nickname;
+  $('meId').textContent='@'+me.username;
+  $('meAvatar').textContent=me.nickname.slice(0,1);
+  seedWelcome();
+  refresh();
+  if(state.timer) clearInterval(state.timer);
+  state.timer=setInterval(refresh, CFG.pollMs);
+}
+
+function seedWelcome(){
+  Store.list().then(function(a){
+    var has = a.some(function(m){ return m.kind==='system'; });
+    if(!has){
+      return Store.add({ mid:uid(), ownerId:'system', ownerName:'系统', content:'欢迎来到星火聊天室！可以发图片/文件/语音，侧栏「👥 好友」能加好友私聊，「🗄 数据库」能看原始记录。想让小星接话，消息里带上 @小星 即可。', kind:'system', createdAt:nowISO() });
+    }
+  }).then(refresh).catch(function(){});
+}
+
+function refresh(){
+  Store.list().then(function(all){
+    // 云端模式：先吸收账号目录 / 好友关系记录到缓存，再把它们从聊天消息里排除
+    if(Store.mode==='cloud') CloudSync.absorb(all);
+    var list=(all||[]).filter(function(m){ return m && m.kind!=='profile' && m.kind!=='social'; });
+    if(state.scope==='db'){ renderDb(list); return; }
+    if(state.scope==='friends'){
+      // 「找人」搜索框在 msgs 区域内：轮询整体重绘会清空正在输入的内容、打断中文输入法。
+      // 输入框聚焦时跳过本轮；好友/申请数据存本机，用户主动操作会显式调 renderFriends 刷新。
+      var fq=$('frQuery');
+      if(fq && fq===document.activeElement) return;
+      renderFriends(); return;
+    }
+    if(state.scope==='dm'){
+      var p=state.pmPeer;
+      if(!p){ box_noop(); return; }
+      list=list.filter(function(m){
+        if(!m.dm) return false;
+        var a=m.ownerUid, b=m.toUid;
+        return (a===state.me.uid && b===p.uid) || (a===p.uid && b===state.me.uid);
+      });
+      render(list); return;
+    }
+    // 群聊大厅 / 个人视图：严格排除私聊消息，避免串消息
+    list=list.filter(function(m){ return !m.dm; });
+    if(state.scope==='mine') list=list.filter(function(m){ return m.ownerId===state.me.id; });
+    render(list);
+  });
+}
+function box_noop(){}
+
+/* 数据库视图：把底层存储的原始记录以表格展示，老师检查时可直接看到库里的字段 */
+function renderDb(list){
+  var box=$('msgs');
+  var cloud = Store.mode==='cloud';
+  var src = cloud ? '腾讯云云数据库集合「'+CFG.collection+'」' : '浏览器本地存储（'+({local:'localStorage',session:'sessionStorage',cookie:'Cookie',name:'window.name',memory:'内存'}[SafeLS.backend()]||'本地')+'）';
+  var head = '<div class="dbwrap"><div class="dbinfo">当前数据源：<b>'+esc(src)+'</b><br>'
+    + '共 <b>'+list.length+'</b> 条消息记录 · 每条消息都带 <span class="mono">ownerId</span> 归属字段，用于隔离与删除校验。'
+    + (cloud ? '<br>同一集合还存有账号目录与好友关系（<span class="mono">kind=profile / social</span>），供跨设备加好友，不计入聊天消息。' : '')
+    + '</div>';
+  if(!list.length){ box.innerHTML=head+'<div class="empty">数据库里还没有记录</div></div>'; return; }
+  var rows=list.map(function(m){
+    var k=(m.kind||'user');
+    var kc = k==='system'?'system':(k==='ai'?'ai':'');
+    var kn = k==='system'?'系统':(k==='ai'?'AI':'用户');
+    var hasImg = typeof m.image==='string' && m.image.indexOf('data:image/')===0;
+    var att;
+    if(hasImg) att='<img class="zoomable" style="max-width:70px;max-height:48px;border-radius:6px;cursor:zoom-in" src="'+esc(m.image)+'" alt="图片" title="点击查看大图"><div class="mono">image/'+Math.round(m.image.length*0.75/1024)+'KB</div>';
+    else if(m.file && typeof m.file.data==='string' && m.file.data.indexOf('data:')===0)
+      att='<div>📎 '+esc(m.file.name||'')+'</div><div class="mono">file/'+esc(FILE.kb(m.file.size))+'</div>';
+    else if(m.audio && typeof m.audio.data==='string' && m.audio.data.indexOf('data:')===0)
+      att='<div>🎤 语音 '+(m.audio.dur||1)+'″</div><div class="mono">audio/'+esc(FILE.kb(m.audio.bytes))+'</div>';
+    else att='<span style="color:#bbb">—</span>';
+    var scopeCell = m.dm
+      ? '<span class="k" style="background:#fff0e6;color:#c26a20">私聊→'+esc(m.toName||m.toUid||'')+'</span>'
+      : '<span style="color:#bbb">群聊</span>';
+    return '<tr>'
+      +'<td class="mono">'+esc(m.mid||'')+'</td>'
+      +'<td class="mono">'+esc(m.ownerId||'')+'</td>'
+      +'<td>'+esc(m.ownerName||'')+'</td>'
+      +'<td><span class="k '+kc+'">'+kn+'</span></td>'
+      +'<td>'+esc(m.content||'')+'</td>'
+      +'<td>'+att+'</td>'
+      +'<td>'+scopeCell+'</td>'
+      +'<td class="mono">'+esc((m.createdAt||'').replace('T',' ').slice(0,19))+'</td>'
+      +'</tr>';
+  }).join('');
+  box.innerHTML=head+'<table class="dbtab"><thead><tr>'
+    +'<th>mid</th><th>owner_id</th><th>owner_name</th><th>kind</th><th>content</th><th>attachment</th><th>scope</th><th>created_at</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  box.querySelectorAll('.zoomable').forEach(function(im){
+    im.addEventListener('click',function(){ openLightbox(im.src); });
+  });
+  box.scrollTop=0;
+}
+
+/* 附件数据缓存：mid -> {data,name}。渲染时只放一个 data-att 标记，
+   避免把几十/几百 KB 的 base64 塞进 innerHTML；点击时才从缓存取，安全且快。 */
+var ATT_CACHE = {};
+function safeDataURL(s){ return (typeof s==='string' && s.indexOf('data:')===0) ? s : ''; }
+
+function render(list){
+  var box=$('msgs');
+  if(!list.length){ box.innerHTML='<div class="empty">还没有消息，来发第一条吧 ✨</div>'; return; }
+  ATT_CACHE = {};
+  box.innerHTML = list.map(function(m){
+    var mine = state.me && m.ownerId===state.me.id;
+    var cls='msg'+(mine?' mine':'')+(m.kind==='ai'?' ai':'');
+    var del = mine ? '<button class="del" data-mid="'+esc(m.mid)+'">删除</button>' : '';
+    var who = m.kind==='ai' ? '小星 · 智能助手'
+            : m.kind==='system' ? '系统公告'
+            : esc(m.ownerName);
+    var pmTag = m.dm ? '<span class="pm-badge">私聊'+(m.toName?' → '+esc(m.toName):'')+'</span>' : '';
+    // 附件优先级：图片 > 文件 > 语音；只信任 data: 前缀，杜绝注入
+    var inner;
+    if(typeof m.image==='string' && m.image.indexOf('data:image/')===0){
+      inner = '<div class="bubble hasimg"><img class="zoomable" src="'+esc(m.image)+'" alt="图片">'
+            + (m.content && m.content!=='[图片]' ? '<div class="img-cap">'+esc(m.content)+'</div>' : '')
+            + '</div>';
+    }else if(m.file && safeDataURL(m.file.data)){
+      ATT_CACHE[m.mid]={data:m.file.data, name:m.file.name||'下载文件'};
+      inner = '<div class="bubble hasatt"><div class="file-card">'
+            + '<div class="file-ico">'+esc(FILE.ext(m.file.name))+'</div>'
+            + '<div class="file-meta"><div class="file-name" title="'+esc(m.file.name)+'">'+esc(m.file.name)+'</div>'
+            + '<div class="file-size">'+esc(FILE.kb(m.file.size))+' · '+esc(m.file.type||'未知类型')+'</div></div>'
+            + '<button class="file-dl" data-dl="'+esc(m.mid)+'">下载</button>'
+            + '</div>'+(m.content && m.content.indexOf('[文件]')!==0 ? '<div class="img-cap">'+esc(m.content)+'</div>':'')
+            + '</div>';
+    }else if(m.audio && safeDataURL(m.audio.data)){
+      ATT_CACHE[m.mid]={data:m.audio.data, name:'语音消息'};
+      var dur=m.audio.dur||1;
+      var bars=''; for(var i=0;i<18;i++){ bars+='<i style="height:'+(5+((i*7+3)%15))+'px"></i>'; }
+      inner = '<div class="bubble hasatt"><div class="voice-card">'
+            + '<button class="voice-play" data-play="'+esc(m.mid)+'" title="播放语音">▶</button>'
+            + '<div class="voice-track"><div class="voice-bars">'+bars+'</div>'
+            + '<div class="voice-time">🔊 '+dur+'″ 语音 · 点击播放</div></div></div></div>';
+    }else{
+      inner = '<div class="bubble">'+esc(m.content)+'</div>';
+    }
+    return '<div class="'+cls+'"><div class="mav">'+esc((m.ownerName||'?').slice(0,1))+'</div>'+
+      '<div class="body"><div class="meta">'+who+pmTag+' &nbsp; '+hhmm(m.createdAt)+del+'</div>'+
+      inner+'</div></div>';
+  }).join('');
+  box.scrollTop=box.scrollHeight;
+  box.querySelectorAll('[data-mid]').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(!confirm('确定删除这条消息吗？只能删除自己的消息。')) return;
+      Store.remove(b.getAttribute('data-mid'), state.me.id).then(refresh)
+        .catch(function(e){ alert(e.message); });
+    });
+  });
+  box.querySelectorAll('.zoomable').forEach(function(im){
+    im.addEventListener('click',function(){ openLightbox(im.src); });
+  });
+  // 文件下载：从缓存取 dataURL，临时创建 <a download> 触发保存
+  box.querySelectorAll('[data-dl]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var a=ATT_CACHE[b.getAttribute('data-dl')];
+      if(!a){ alert('附件已失效，请刷新'); return; }
+      var link=document.createElement('a');
+      link.href=a.data; link.download=a.name; document.body.appendChild(link);
+      link.click(); document.body.removeChild(link);
+    });
+  });
+  // 语音播放：从缓存取音频，用 Audio 对象播放并高亮按钮
+  box.querySelectorAll('[data-play]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var a=ATT_CACHE[b.getAttribute('data-play')];
+      if(!a){ alert('语音已失效，请刷新'); return; }
+      if(state._audio){ try{ state._audio.pause(); }catch(e){} }
+      if(state._playBtn){ state._playBtn.textContent='▶'; }
+      var au=new Audio(a.data); state._audio=au; state._playBtn=b;
+      b.textContent='⏸';
+      au.play().catch(function(e){ b.textContent='▶'; alert('播放失败：'+(e&&e.message)); });
+      au.onended=function(){ b.textContent='▶'; state._audio=null; state._playBtn=null; };
+    });
+  });
+}
+
+function openLightbox(src){
+  $('lightboxImg').src=src;
+  $('lightbox').style.display='flex';
+}
+
+/* ===== 好友视图：搜索加好友 / 处理申请 / 好友列表 / 发起私聊 ===== */
+function renderFriends(){
+  var box=$('msgs'), me=state.me, tab=state.frTab||'friends';
+  var incoming=Social.incoming(me), outgoing=Social.outgoing(me), friends=Social.friendsOf(me);
+  var tabs = '<div class="fr-tabs">'
+    + '<button class="fr-tab'+(tab==='friends'?' active':'')+'" data-tab="friends">👥 好友 '+friends.length+'</button>'
+    + '<button class="fr-tab'+(tab==='find'?' active':'')+'" data-tab="find">🔍 找人</button>'
+    + '<button class="fr-tab'+(tab==='req'?' active':'')+'" data-tab="req">📨 申请'+(incoming.length?'<span class="cnt">'+incoming.length+'</span>':'')+'</button>'
+    + '</div>';
+  var note = Store.mode==='cloud'
+    ? '<div class="fr-note">当前是<b>云端数据库模式</b>：账号目录和好友关系已同步到云端。两台设备打开同一个网址、各自注册账号后，就能在「找人」里互相搜到、加好友、私聊（约 2~3 秒同步一次）。</div>'
+    : '<div class="fr-note">账号注册在本机浏览器中，所以「找人」列出的是<b>这台设备上注册过的账号</b>。'
+      + '想演示完整流程：先注册 A，退出后再注册 B → B 搜 A 发申请 → 退出用 A 登录 → 在「申请」里同意 → 双方即可私聊。'
+      + '要真正跨设备加好友，按部署指南填环境 ID 发布到云端即可。</div>';
+  var body='';
+  if(tab==='find'){
+    body = '<div class="fr-search"><input id="frQuery" type="text" placeholder="输入对方账号（支持模糊搜索）" maxlength="24" value="'+esc(state.frQuery||'')+'">'
+      + '<button id="frSearchBtn">搜索</button></div><div id="frResult"></div>';
+  }else if(tab==='req'){
+    var h='<div class="fr-sec">收到的申请（'+incoming.length+'）</div>';
+    if(!incoming.length) h+='<div class="fr-empty">暂时没有收到的申请</div>';
+    incoming.forEach(function(r){
+      h+='<div class="fr-row"><div class="fr-av">'+esc((r.fromName||'?').slice(0,1))+'</div>'
+        +'<div class="fr-info"><div class="fr-nm">'+esc(r.fromName||r.from)+' 想加你为好友</div>'
+        +'<div class="fr-id">@'+esc(r.from)+' · '+hhmm(r.createdAt)+'</div></div>'
+        +'<div class="fr-ops"><button class="fr-btn ok" data-accept="'+esc(r.id)+'">✓ 同意</button>'
+        +'<button class="fr-btn no" data-reject="'+esc(r.id)+'">✕ 拒绝</button></div></div>';
+    });
+    h+='<div class="fr-sec">我发出的申请（'+outgoing.length+'）</div>';
+    if(!outgoing.length) h+='<div class="fr-empty">还没有发出申请，去「找人」里添加吧</div>';
+    outgoing.forEach(function(r){
+      h+='<div class="fr-row"><div class="fr-av">'+esc((r.toName||'?').slice(0,1))+'</div>'
+        +'<div class="fr-info"><div class="fr-nm">@'+esc(r.to)+'</div>'
+        +'<div class="fr-id">等待对方同意 · '+hhmm(r.createdAt)+'</div></div>'
+        +'<div class="fr-ops"><span class="fr-btn" style="cursor:default">待处理</span></div></div>';
+    });
+    body=h;
+  }else{
+    var b='<div class="fr-sec">我的好友（'+friends.length+'）</div>';
+    if(!friends.length) b+='<div class="fr-empty">还没有好友，点「🔍 找人」添加第一个吧</div>';
+    friends.forEach(function(f){
+      b+='<div class="fr-row"><div class="fr-av">'+esc((f.nickname||'?').slice(0,1))+'</div>'
+        +'<div class="fr-info"><div class="fr-nm">'+esc(f.nickname)+'</div>'
+        +'<div class="fr-id">@'+esc(f.uid)+'</div></div>'
+        +'<div class="fr-ops"><button class="fr-btn pri" data-chat="'+esc(f.uid)+'" data-nick="'+esc(f.nickname)+'">💬 私聊</button>'
+        +'<button class="fr-btn no" data-unfriend="'+esc(f.uid)+'">删除</button></div></div>';
+    });
+    body=b;
+  }
+  box.innerHTML='<div class="frwrap">'+tabs+note+body+'</div>';
+  box.scrollTop=0;
+
+  box.querySelectorAll('[data-tab]').forEach(function(b){
+    b.addEventListener('click',function(){ state.frTab=b.getAttribute('data-tab'); renderFriends(); });
+  });
+  var qi=$('frQuery');
+  function doSearch(){
+    var raw=($('frQuery')&&$('frQuery').value)||'';
+    state.frQuery=raw;                 // 记住输入，视图重绘后可恢复
+    var q=raw.trim().toLowerCase(), res=$('frResult');
+    if(!q){ res.innerHTML='<div class="fr-empty">输入账号后点搜索</div>'; return; }
+    var found=Auth.directory().filter(function(u){ return u.uid!==me.uid && u.uid.indexOf(q)>=0; });
+    if(!found.length){ res.innerHTML='<div class="fr-empty">没找到匹配的账号。可先退出注册一个新账号再来加好友。</div>'; return; }
+    res.innerHTML='<div class="fr-sec">搜索结果（'+found.length+'）</div>'+found.map(function(u){
+      var fr=Social.isFriend(me.uid,u.uid), sent=!!Social.pendingRequest(me.uid,u.uid);
+      var op = fr ? '<span class="fr-btn" style="cursor:default">已是好友</span>'
+        : sent ? '<span class="fr-btn" style="cursor:default">申请已发出</span>'
+        : '<button class="fr-btn pri" data-add="'+esc(u.uid)+'" data-nick="'+esc(u.nickname)+'">＋ 加好友</button>';
+      return '<div class="fr-row"><div class="fr-av">'+esc((u.nickname||'?').slice(0,1))+'</div>'
+        +'<div class="fr-info"><div class="fr-nm">'+esc(u.nickname)+'</div><div class="fr-id">@'+esc(u.uid)+'</div></div>'
+        +'<div class="fr-ops">'+op+'</div></div>';
+    }).join('');
+    res.querySelectorAll('[data-add]').forEach(function(b){
+      b.addEventListener('click',function(){
+        var r=Social.request(me,{uid:b.getAttribute('data-add'),nickname:b.getAttribute('data-nick')});
+        if(!r.ok){ alert(r.error); return; }
+        if(r.auto){ alert('对方也向你发过申请，已自动成为好友！'); }else{ alert('好友申请已发出，等对方登录后在「申请」里同意'); }
+        renderFriends();               // 由 renderFriends 统一重绘，并自动恢复搜索结果
+      });
+    });
+  }
+  if($('frSearchBtn')) $('frSearchBtn').addEventListener('click',doSearch);
+  if(qi){
+    qi.addEventListener('input',function(){ state.frQuery=this.value; });  // 实时记住输入
+    qi.addEventListener('keydown',function(e){ if(e.key==='Enter') doSearch(); });
+  }
+  // 视图被重绘后（切回本页 / 处理完申请），自动恢复上次的搜索词与结果
+  if(tab==='find' && (state.frQuery||'').trim() && $('frResult')) doSearch();
+  box.querySelectorAll('[data-accept],[data-reject]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var id=b.getAttribute('data-accept')||b.getAttribute('data-reject');
+      var r=Social.respond(id, me, !!b.getAttribute('data-accept'));
+      if(!r.ok){ alert(r.error); return; }
+      renderFriends();
+    });
+  });
+  box.querySelectorAll('[data-unfriend]').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(!confirm('确定删除这个好友吗？（会同时清除相关申请）')) return;
+      Social.remove(me, b.getAttribute('data-unfriend')); renderFriends();
+    });
+  });
+  box.querySelectorAll('[data-chat]').forEach(function(b){
+    b.addEventListener('click',function(){
+      openPm({uid:b.getAttribute('data-chat'),nickname:b.getAttribute('data-nick')});
+    });
+  });
+}
+
+/* extra 可选：{image, file, audio, dm:{to,toName}} —— 统一挂到消息对象上，与 ownerId 隔离并存 */
+function send(text, kind, image, extra){
+  if(!state.me){ return Promise.reject(new Error('请先登录')); }
+  var r=Rate.check(state.me.id);
+  if(!r.ok){
+    $('tip').textContent='发送太频繁啦，请 '+r.wait+' 秒后再试（60 秒内最多 '+CFG.rateMax+' 条）';
+    return Promise.resolve(false);
+  }
+  $('tip').textContent='';
+  var msg = {
+    mid:uid(), ownerId:state.me.id, ownerUid:state.me.uid, ownerName:state.me.nickname,
+    content:text, kind:kind||'user', createdAt:nowISO()
+  };
+  if(image) msg.image=image;               // 图片：base64 dataURL
+  if(extra){
+    if(extra.file)  msg.file  = extra.file;   // 文件：{name,size,type,data}
+    if(extra.audio) msg.audio = extra.audio; // 语音：{data,dur,mime,bytes}
+    if(extra.dm){ msg.dm=true; msg.toUid=extra.dm.to; msg.toName=extra.dm.toName; } // 私聊
+  }
+  return Store.add(msg).then(refresh).then(function(){ return true; });
+}
+
+/* ===== 发送文件 ===== */
+function doSendFile(file){
+  if(!state.me){ $('tip').textContent='请先登录'; return; }
+  if(state.scope!=='all' && state.scope!=='dm'){ $('tip').textContent='请切回「群聊大厅」或进入私聊再发文件'; return; }
+  $('btnFile').disabled=true; $('tip').textContent='读取文件中…';
+  var dm = (state.scope==='dm' && state.pmPeer) ? {to:state.pmPeer.uid,toName:state.pmPeer.nickname} : null;
+  FILE.read(file).then(function(f){
+    $('tip').textContent='发送中…（'+FILE.kb(f.size)+'）';
+    var cap=$('input').value.trim();
+    return send(cap||'[文件] '+f.name, 'user', null, {file:f, dm:dm});
+  }).then(function(ok){
+    if(ok!==false){ $('input').value=''; $('input').style.height='auto'; }
+    $('tip').textContent='';
+  }).catch(function(e){
+    $('tip').textContent='文件发送失败：'+((e&&e.message)||'未知错误');
+  }).then(function(){ $('btnFile').disabled=false; $('fileAny').value=''; });
+}
+
+/* ===== 发送语音（录音或音频文件） ===== */
+function doSendVoice(audio){
+  if(!state.me){ $('tip').textContent='请先登录'; return; }
+  if(state.scope!=='all' && state.scope!=='dm'){ $('tip').textContent='请切回「群聊大厅」或进入私聊再发语音'; return; }
+  var dm = (state.scope==='dm' && state.pmPeer) ? {to:state.pmPeer.uid,toName:state.pmPeer.nickname} : null;
+  $('tip').textContent='语音发送中…';
+  send('[语音] '+audio.dur+'″', 'user', null, {audio:audio, dm:dm}).then(function(ok){
+    if(ok!==false){ $('input').value=''; $('input').style.height='auto'; }
+    $('tip').textContent='';
+  }).catch(function(e){ $('tip').textContent='语音发送失败：'+((e&&e.message)||'未知错误'); });
+}
+
+/* 录音按钮：点一次开始，再点一次停止并发送；计时到上限自动停止 */
+function toggleRecord(){
+  if(VOICE.active){
+    VOICE.stop().then(function(a){
+      if(a.bytes > CFG.maxFileBytes){ throw new Error('录音超过 '+Math.round(CFG.maxFileBytes/1024)+'KB，请录短一点'); }
+      if(Store.mode!=='cloud' && SafeLS.level()<2 && a.bytes > 180*1024){ throw new Error('当前浏览器存储受限，请录短一点（或填 env 用云端）'); }
+      doSendVoice(a);
+    }).catch(function(e){ $('tip').textContent='录音失败：'+((e&&e.message)||'未知错误'); });
+    stopRecUI(); return;
+  }
+  $('btnVoice').disabled=true;
+  VOICE.start().then(function(){
+    VOICE.active=true; // start 内已置位，保险
+    $('btnVoice').disabled=false; $('btnVoice').classList.add('on'); $('btnVoice').textContent='⏹ 停止';
+    $('recHint').style.display='inline'; $('recHint').textContent='录音中 0s · 再点停止发送';
+    $('tip').textContent='正在录音（麦克风）…';
+    var s=0;
+    VOICE.timer=setInterval(function(){
+      s++;
+      $('recHint').textContent='录音中 '+s+'s · 再点停止发送';
+      if(s>=(CFG.maxVoiceSec||60)){ toggleRecord(); }
+    },1000);
+  }).catch(function(e){
+    $('btnVoice').disabled=false; stopRecUI();
+    // 预览面板 / 无权限时降级：让用户选择本地音频文件当语音发，保证任何环境都能演示
+    var msg='当前环境无法录音（麦克风被禁用或不支持）';
+    if(confirm('无法使用麦克风录音。\n\n是否改为「选择一个音频文件」作为语音消息发送？\n（预览面板常禁用麦克风，用这个方式也能完整演示语音功能）')){
+      $('fileAudio').click();
+      msg='已打开文件选择框：选一个 mp3/wav 即可作为语音消息发出';
+    }else{
+      msg='已取消。也可点「📎 文件」上传音频，或发布到正式域名后使用麦克风';
+    }
+    $('tip').textContent=msg;
+  });
+}
+function stopRecUI(){
+  VOICE.active=false;
+  if(VOICE.timer){ clearInterval(VOICE.timer); VOICE.timer=null; }
+  $('btnVoice').classList.remove('on'); $('btnVoice').textContent='🎤 语音';
+  $('recHint').style.display='none'; $('tip').textContent='';
+}
+
+/* 音频文件降级：读成 base64，按估算时长生成语音消息 */
+function doSendAudioFile(file){
+  if(!file){ return; }
+  $('tip').textContent='读取音频中…';
+  FILE.read(file).then(function(f){
+    // 无法精确解析时长，按体积粗估（约 16KB/s），至少 1 秒
+    var dur=Math.max(1, Math.min(999, Math.round(f.size/16000)));
+    doSendVoice({ data:f.data, dur:dur, mime:f.type||'audio/mpeg', bytes:f.size });
+  }).catch(function(e){ $('tip').textContent='音频读取失败：'+((e&&e.message)||'未知错误'); })
+    .then(function(){ $('fileAudio').value=''; });
+}
+
+/* 发送图片：压缩后作为图片消息发出，可附带输入框里的文字作为说明 */
+function doSendImage(file){
+  if(!state.me){ $('tip').textContent='请先登录'; return; }
+  if(state.scope!=='all' && state.scope!=='dm'){ $('tip').textContent='请切回「群聊大厅」或进入私聊再发图片'; return; }
+  var dm = (state.scope==='dm' && state.pmPeer) ? {to:state.pmPeer.uid,toName:state.pmPeer.nickname} : null;
+  $('btnImg').disabled=true;
+  $('tip').textContent='图片压缩中…';
+  IMG.read(file).then(function(info){
+    // 本地模式配额保护：避免超出存储上限导致整批消息写入失败
+    if(Store.mode!=='cloud' && SafeLS.level()<2 && info.bytes>800*1024){
+      throw new Error('图片太大且当前浏览器存储受限，请换小图或改用云端模式');
+    }
+    var cap=$('input').value.trim();
+    var text = cap || '[图片]';
+    $('tip').textContent='发送中…（约 '+Math.round(info.bytes/1024)+'KB）';
+    return send(text, 'user', info.dataURL, {dm:dm});
+  }).then(function(ok){
+    if(ok!==false){ $('input').value=''; $('input').style.height='auto'; }
+    $('tip').textContent='';
+  }).catch(function(e){
+    $('tip').textContent='图片发送失败：'+((e&&e.message)||'未知错误');
+  }).then(function(){
+    $('btnImg').disabled=false;
+    $('fileImg').value=''; // 允许重复选同一张
+  });
+}
+
+/* @小星 触发：消息里带这个词才让 Coze 接话，普通聊天不会误触发 */
+var MENTION='@小星';
+function hasMention(text){ return String(text||'').indexOf(MENTION)>=0; }
+function cleanMention(text){ // 传给 Coze 时去掉触发词，避免 AI 看到这个标记
+  return String(text||'').split(MENTION).join('').replace(/\s+/g,' ').trim();
+}
+
+function doSend(){
+  var el=$('input'), text=el.value.trim();
+  if(!text) return;
+  var isDm = state.scope==='dm';
+  if(state.scope!=='all' && !isDm){
+    $('tip').textContent = state.scope==='db' ? '当前是「数据库」视图，请切回群聊大厅发消息'
+      : state.scope==='friends' ? '当前是「好友」视图，请点好友的「💬 私聊」或切回群聊大厅'
+      : '当前是「个人」视图，请切回群聊大厅发消息';
+    return;
+  }
+  if(!isDm && hasMention(text)){ askAI(text); return; } // 群聊里带 @小星 → 走 Coze
+  var dm = isDm && state.pmPeer ? {to:state.pmPeer.uid,toName:state.pmPeer.nickname} : null;
+  $('btnSend').disabled=true;
+  Promise.resolve(send(text,'user',null,{dm:dm})).then(function(ok){
+      if(ok!==false){ el.value=''; el.style.height='auto'; }
+    })
+    .catch(function(e){ $('tip').textContent='发送失败：'+(e&&e.message?e.message:'未知错误'); })
+    .then(function(){ $('btnSend').disabled=false; el.focus(); });
+}
+
+/* 构建对话历史：取当前用户的最近若干轮 user/ai 消息，作为上下文随问题发给扣子。
+   只取本人 + 小星的消息，避免把别人的群聊内容当成本人的记忆。 */
+function buildHistory(meId, excludeMid){
+  return Store.list().then(function(list){
+    var picked=[];
+    for(var i=0;i<list.length;i++){
+      var m=list[i];
+      if(m.mid===excludeMid || m.dm || m.kind==='profile' || m.kind==='social') continue; // 私聊/账号/关系记录不进群聊上下文
+      var isMine = m.kind==='user' && m.ownerId===meId;
+      var isAI = m.kind==='ai';
+      if(!isMine && !isAI) continue;
+      var c=String(m.content||'').trim();
+      if(!c || c==='[图片]' || c.indexOf('[文件]')===0 || c.indexOf('[语音]')===0) continue;
+      picked.push({ role: isAI?'assistant':'user', content:c.slice(0,300) });
+    }
+    return picked.slice(-10); // 最近 10 条（约 5 轮）
+  }).catch(function(){ return []; });
+}
+
+// preset：从 doSend 传入的原文（含 @小星）；按钮点击时不传，直接读输入框
+function askAI(preset){
+  var el=$('input');
+  var raw = (typeof preset==='string' && preset.trim()) ? preset.trim() : el.value.trim();
+  if(!raw){ $('tip').textContent='先在输入框写点内容，带上 @小星 发出去，小星就会接话'; el.focus(); return; }
+  if(state.scope!=='all'){ $('tip').textContent='当前视图不能找小星，请切回「群聊大厅」'; return; }
+  if(state.asking) return;
+  var question = cleanMention(raw) || raw; // 去掉触发词；若只剩触发词则原样问
+  state.asking=true; $('tip').textContent='小星思考中…（首次调用约需 3~10 秒）'; $('btnSend').disabled=true;
+  var uidAI = state.me ? state.me.id : 'guest';
+  // 先抓历史（此时当前问题还没入库），再发问题、带着历史调 AI
+  buildHistory(uidAI, null)
+    .then(function(history){
+      return send(raw,'user').then(function(ok){ // 原文入库（含 @小星）
+        if(ok===false) throw new Error('rate-limited'); // 被限流则不调 AI
+        return AI.answer(question, uidAI, history);
+      });
+    })
+    .then(function(ans){
+      return Store.add({ mid:uid(), ownerId:'ai', ownerName:'小星 · Coze', content:ans, kind:'ai', createdAt:nowISO() });
+    })
+    .then(function(){ el.value=''; el.style.height='auto'; $('tip').textContent=''; refresh(); })
+    .catch(function(e){
+      $('tip').textContent = (e && e.message==='rate-limited')
+        ? '' : ('小星开小差了：'+((e&&e.message)||'未知错误'));
+    })
+    .then(function(){ state.asking=false; $('btnSend').disabled=false; });
+}
+
+function switchScope(scope){
+  state.scope=scope;
+  $('navAll').classList.toggle('active',scope==='all');
+  $('navMine').classList.toggle('active',scope==='mine');
+  $('navDb').classList.toggle('active',scope==='db');
+  $('navFriends').classList.toggle('active',scope==='friends');
+  $('navPm').classList.toggle('active',scope==='dm');
+  // 保留 pmPeer：从私聊切到别处后，侧栏「💬 私聊」仍可一键回到刚才的对话
+  $('navPm').style.display = state.pmPeer ? '' : 'none';
+  var titles={all:'群聊大厅',mine:'个人',db:'数据库',friends:'好友',dm:'私聊'};
+  var descs={
+    all:'和群里的小伙伴聊点什么吧 · 可发图片 / 文件 / 语音',
+    mine:'这里只有你发过的消息',
+    db:'底层存储的原始记录（编号 / 归属 / 类型 / 附件 / 范围 / 时间）',
+    friends:'搜索用户、处理好友申请、发起私聊',
+    dm: state.pmPeer ? ('与 '+state.pmPeer.nickname+' 的私密对话 · 群聊大厅看不到') : '私聊'
+  };
+  $('chatTitle').textContent = titles[scope]||'群聊大厅';
+  $('chatDesc').textContent = descs[scope]||'';
+  refresh();
+}
+
+/* 进入与某好友的私聊 */
+function openPm(peer){
+  if(!Social.isFriend(state.me.uid, peer.uid)){ alert('对方还不是你的好友，请先加好友'); return; }
+  state.pmPeer=peer; state.frTab='friends';
+  switchScope('dm');
+}
+
+function showView(name){
+  var reg = name==='reg';
+  $('loginView').style.display = reg?'none':'block';
+  $('regView').style.display   = reg?'block':'none';
+  $('entryErr').textContent=''; $('regErr').textContent='';
+}
+
+function exitChat(){
+  if(state.timer){ clearInterval(state.timer); state.timer=null; }
+  if(state._audio){ try{ state._audio.pause(); }catch(e){} state._audio=null; }
+  if(VOICE.active){ VOICE.cancel(); stopRecUI(); }
+  try{ SafeLS.removeItem('spark_chat_me'); }catch(e){}
+  state.me=null; state.scope='all'; state.pmPeer=null; state.frTab='friends'; state.frQuery='';
+  $('navPm').style.display='none';
+  $('chat').style.display='none'; $('entry').style.display='flex';
+  $('loginUser').value=''; $('loginPass').value=''; $('entryErr').textContent='';
+  $('regUser').value=''; $('regPass').value=''; $('regPass2').value=''; $('regNick').value='';
+  showView('login');
+}
+
+function loadCloudSDK(cb){
+  if(typeof window.cloudbase!=='undefined'){ cb(true); return; }
+  var s=document.createElement('script');
+  s.src='https://static.cloudbase.net/cloudbase-js-sdk/2.7.1/cloudbase.full.js';
+  s.onload=function(){ cb(true); }; s.onerror=function(){ cb(false); };
+  document.head.appendChild(s);
+}
+
+/* 启动 */
+document.addEventListener('DOMContentLoaded',function(){
+  function bootstrap(){
+    Store.init().then(function(){
+      setModeUI();
+      // 云端模式：先读一次云端目录，再把本机已有账号补上去（避免重复写入）
+      if(Store.mode==='cloud'){
+        Store.list().then(function(all){ CloudSync.absorb(all); CloudSync.publishLocalUsers(); })
+          .catch(function(e){ console.warn('云端账号目录同步失败：',e); });
+      }
+      // 恢复上次登录的账号（仅填账号，密码需重新输入）
+      try{
+        var m=JSON.parse(SafeLS.getItem('spark_chat_me')||'null');
+        if(m && m.username){ $('loginUser').value=m.username; }
+      }catch(e){}
+    });
+  }
+  if(CFG.env) loadCloudSDK(bootstrap); else bootstrap();
+
+  $('goRegister').addEventListener('click',function(){ showView('reg'); $('regUser').focus(); });
+  $('goLogin').addEventListener('click',function(){ showView('login'); $('loginUser').focus(); });
+
+  $('btnEnter').addEventListener('click',function(){
+    var account=$('loginUser').value.trim();
+    var pass=$('loginPass').value;
+    if(!account){ $('entryErr').textContent='请输入账号'; return; }
+    if(pass.length<4){ $('entryErr').textContent='密码至少 4 位'; return; }
+    var r=Auth.login(account, pass);
+    if(!r.ok){ $('entryErr').textContent=r.error; return; }
+    $('entryErr').textContent='';
+    $('btnEnter').disabled=true;
+    enter(r.me);
+    $('btnEnter').disabled=false;
+  });
+  ['loginUser','loginPass'].forEach(function(id){
+    $(id).addEventListener('keydown',function(e){ if(e.key==='Enter') $('btnEnter').click(); });
+  });
+
+  $('btnRegister').addEventListener('click',function(){
+    var account=$('regUser').value.trim();
+    var pass=$('regPass').value;
+    var pass2=$('regPass2').value;
+    var nick=$('regNick').value.trim();
+    if(!account){ $('regErr').textContent='请输入账号'; return; }
+    if(pass.length<4){ $('regErr').textContent='密码至少 4 位'; return; }
+    if(pass!==pass2){ $('regErr').textContent='两次密码不一致'; return; }
+    var r=Auth.register(account, pass, nick);
+    if(!r.ok){ $('regErr').textContent=r.error; return; }
+    $('regErr').textContent='';
+    $('btnRegister').disabled=true;
+    enter(r.me);
+    $('btnRegister').disabled=false;
+  });
+  ['regUser','regPass','regPass2','regNick'].forEach(function(id){
+    $(id).addEventListener('keydown',function(e){ if(e.key==='Enter') $('btnRegister').click(); });
+  });
+  $('btnSend').addEventListener('click',doSend);
+  $('btnImg').addEventListener('click',function(){ $('fileImg').click(); });
+  $('fileImg').addEventListener('change',function(){
+    if(this.files && this.files[0]) doSendImage(this.files[0]);
+  });
+  // 上传文件
+  $('btnFile').addEventListener('click',function(){ $('fileAny').click(); });
+  $('fileAny').addEventListener('change',function(){
+    if(this.files && this.files[0]) doSendFile(this.files[0]);
+  });
+  // 语音：录音按钮 + 音频文件降级通道
+  $('btnVoice').addEventListener('click',toggleRecord);
+  $('fileAudio').addEventListener('change',function(){
+    if(this.files && this.files[0]) doSendAudioFile(this.files[0]);
+  });
+  $('lightbox').addEventListener('click',function(){
+    this.style.display='none'; $('lightboxImg').src='';
+  });
+  $('navAi').addEventListener('click',function(){
+    // 点按钮 = 自动给当前输入加上 @小星 并发送，与手打 @小星 走同一条逻辑
+    var el=$('input'), v=el.value.trim();
+    if(!v){ $('tip').textContent='先在输入框写点内容，点小星会自动帮你 @ 它'; el.focus(); return; }
+    if(!hasMention(v)) el.value = MENTION+' '+v;
+    askAI();
+  });
+  $('navAll').addEventListener('click',function(){ switchScope('all'); });
+  $('navMine').addEventListener('click',function(){ switchScope('mine'); });
+  $('navDb').addEventListener('click',function(){ switchScope('db'); });
+  $('navFriends').addEventListener('click',function(){ switchScope('friends'); });
+  $('navPm').addEventListener('click',function(){ if(state.pmPeer) switchScope('dm'); });
+  $('btnExit').addEventListener('click',exitChat);
+  $('input').addEventListener('compositionstart',function(){ state.composing=true; });
+  $('input').addEventListener('compositionend',function(){ state.composing=false; });
+  $('input').addEventListener('keydown',function(e){
+    // 中文输入法组词中按 Enter 是「确认候选字」，不能当成发送，否则看起来像没反应
+    if(state.composing || e.isComposing || e.keyCode===229) return;
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); doSend(); }
+  });
+  $('input').addEventListener('input',function(){
+    this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px';
+  });
+});
+})();
+</script>
+</body>
+</html>
