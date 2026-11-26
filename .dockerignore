@@ -1,0 +1,15 @@
+# 构建上下文是仓库根，排除无关文件，减小上传体积、加快构建
+.git
+.gitignore
+.workbuddy
+**/node_modules
+**/data
+chat_room_application
+chat_room_application_extracted
+_uploaded_extract
+_*
+processed_image_*
+*.png
+*.jpg
+*.zip
+docs

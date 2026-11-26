@@ -862,7 +862,7 @@ html[data-bubble] .msg.mine .bubble.sticker-bub{background:transparent;border:no
 <script>
 /* 如需接云端：把下面 env 改成你的腾讯云环境 ID；留空 = 本地存储模式（也能完整体验） */
 window.CHAT_CONFIG = {
-  apiBase: '',             // 自建后端地址（云托管域名，如 'https://xxx.tcloudbaseapp.com'）；填了就走后端 API
+  apiBase: '',             // 留空 = 自动用同源 /api（云托管单服务部署即如此，无需填写）；跨域部署才填后端域名
   env: '',                 // 例：'chatroom-1g8abcd1234'
   collection: 'chat_messages',
   rateWindowMs: 60000,     // 限流窗口：60 秒
@@ -933,7 +933,7 @@ window.CHAT_CONFIG = {
       <button id="btnEnter" class="btn">登录并进入</button>
       <div class="switch-line">还没有账号？<a id="goRegister">立即注册</a></div>
       <div class="known-box">
-        <div class="known-title"><b>本机已注册的账号</b><span id="knownCount"></span></div>
+        <div class="known-title"><b id="knownTitle">本机已注册的账号</b><span id="knownCount"></span></div>
         <div class="known-list" id="knownList"></div>
         <div class="known-note" id="knownNote"></div>
       </div>
@@ -941,7 +941,7 @@ window.CHAT_CONFIG = {
 
     <!-- 注册视图 -->
     <div id="regView" style="display:none">
-      <p class="intro">创建一个新账号，注册后自动进入群聊。<br>账号密码保存在本机，可跨刷新使用。</p>
+      <p class="intro" id="regIntro">创建一个新账号，注册后自动进入群聊。<br>账号密码保存在本机，可跨刷新使用。</p>
       <label class="field-label" for="regUser">账号</label>
       <input id="regUser" class="nick-input" type="text" placeholder="例如：xiaoming" maxlength="24" autocomplete="username">
       <label class="field-label" for="regPass" style="margin-top:14px">密码</label>
@@ -1499,38 +1499,52 @@ var Store = {
   LS_MSG:'spark_chat_messages_v1', LS_RATE:'spark_chat_rate_v1',
   init:function(){
     var self=this;
-    if(CFG.apiBase){
+    // 同源部署：页面和 API 由同一个服务提供时（云托管单服务 / 本地 node server），
+    // 自动探测本域名的 /api/health，通了就走后端，不用填 apiBase。
+    function useApi(){
       return Api.boot().then(function(){
-        self.mode='api';
+        self.mode='api'; self.reason='';
         return Api.sync();                       // 先拉一次全量，账号目录/好友关系/消息都到手
-      }).catch(function(e){
+      });
+    }
+    function fallback(){
+      if(!CFG.env){ self.reason='未填写环境 ID'; self.mode='local'; return Promise.resolve(); }
+      if(typeof window.cloudbase==='undefined'){
+        self.reason='云 SDK 未加载（可能被网络/CDN 拦截）'; self.mode='local'; return Promise.resolve();
+      }
+      try{
+        self.app = cloudbase.init({ env: CFG.env });
+        var auth = self.app.auth({ persistence:'local' });
+        return Promise.resolve(auth.getLoginState && auth.getLoginState())
+          .then(function(state){ if(!state) return auth.signInAnonymously(); })
+          .then(function(){ self.db=self.app.database(); self.mode='cloud'; self.reason=''; })
+          .catch(function(e){
+            self.reason = (e && (e.error_description||e.message||e.code)) || '匿名登录失败（检查是否开启匿名登录 / 安全域名）';
+            console.warn('云模式失败，降级本地：', e);
+            self.mode='local';
+          });
+      }catch(e){
+        self.reason='云 SDK 初始化异常：' + ((e&&e.message)||e);
+        console.warn('云 SDK 异常，降级本地：',e);
+        self.mode='local';
+      }
+      return Promise.resolve();
+    }
+    if(CFG.apiBase){
+      return useApi().catch(function(e){
         self.reason='后端不可达：'+((e&&e.message)||e);
         self.mode='local';
         console.warn('后端不可用，退回本地模式：',e);
       });
     }
-    if(!CFG.env){ self.reason='未填写环境 ID'; self.mode='local'; return Promise.resolve(); }
-    if(typeof window.cloudbase==='undefined'){
-      self.reason='云 SDK 未加载（可能被网络/CDN 拦截）'; self.mode='local'; return Promise.resolve();
+    // 只有 http(s) 打开才谈得上同源；file:// 直接走云端/本地
+    if(location.protocol==='http:' || location.protocol==='https:'){
+      return useApi().catch(function(e){
+        console.log('同源未提供 /api（正常现象，走云端或本地）：', e && e.message);
+        return fallback();
+      });
     }
-    try{
-      self.app = cloudbase.init({ env: CFG.env });
-      var auth = self.app.auth({ persistence:'local' });
-      return Promise.resolve(auth.getLoginState && auth.getLoginState())
-        .then(function(state){ if(!state) return auth.signInAnonymously(); })
-        .then(function(){ self.db=self.app.database(); self.mode='cloud'; self.reason=''; })
-        .catch(function(e){
-          // 常见原因：控制台没开「匿名登录」、安全域名没配、网络到不了云开发网关
-          self.reason = (e && (e.error_description||e.message||e.code)) || '匿名登录失败（检查是否开启匿名登录 / 安全域名）';
-          console.warn('云模式失败，降级本地：', e);
-          self.mode='local';
-        });
-    }catch(e){
-      self.reason='云 SDK 初始化异常：' + ((e&&e.message)||e);
-      console.warn('云 SDK 异常，降级本地：',e);
-      self.mode='local';
-    }
-    return Promise.resolve();
+    return fallback();
   },
   list:function(){
     if(this.mode==='api'){
@@ -2332,7 +2346,15 @@ function renderKnownAccounts(){
     });
   }
   var label={local:'浏览器本地存储',session:'本次会话存储',cookie:'浏览器 Cookie',name:'标签页临时存储',memory:'内存（刷新会清空）'}[SafeLS.backend()]||'本地存储';
-  note.innerHTML = Store.mode==='cloud'
+  var title=$('knownTitle');
+  if(title) title.textContent = Store.mode==='api' ? '服务器上的账号' : '本机已注册的账号';
+  var ri=$('regIntro');
+  if(ri) ri.innerHTML = Store.mode==='api'
+    ? '创建一个新账号，注册后自动进入群聊。<br>账号存在服务器数据库，换设备也能登录。'
+    : '创建一个新账号，注册后自动进入群聊。<br>账号密码保存在本机，可跨刷新使用。';
+  note.innerHTML = Store.mode==='api'
+    ? '账号存在服务端数据库里，换设备、换浏览器、清缓存后都还能登录。'
+    : Store.mode==='cloud'
     ? '当前为云端模式，账号会同步到云数据库。'
     : '这些账号保存在<b>'+esc(label)+'</b>里。当前未填云端环境 ID，属于本地模式；若清理浏览器数据或换设备 / 换浏览器，记录不会跟随。';
 }

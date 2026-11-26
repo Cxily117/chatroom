@@ -30,6 +30,20 @@ const ALLOW_ORIGIN = process.env.ALLOW_ORIGIN || '*';
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'chatroom-demo-secret';
 const TOKEN_TTL_MS = 30 * 24 * 3600 * 1000;   // 30 天
 
+/* 前端页面目录：容器里是 /app/public（Dockerfile 拷进来的），本地开发是仓库根目录。
+   —— 这样同一个服务既给页面又给 API，云托管一次部署即可，不需要静态网站托管。 */
+const WEB_ROOT = (() => {
+  const candidates = [
+    process.env.WEB_ROOT,
+    path.join(__dirname, 'public'),
+    path.join(__dirname, '..')
+  ].filter(Boolean);
+  for (const dir of candidates) {
+    try { if (fs.existsSync(path.join(dir, 'index.html'))) return dir; } catch (e) { /* 忽略 */ }
+  }
+  return path.join(__dirname, 'public');
+})();
+
 /* ===================== 工具（hash 与前端保持同一算法） ===================== */
 
 function hash(s) {
@@ -477,6 +491,29 @@ app.post('/api/friends/remove', async (req, res) => {
   }
 });
 
+/* ===================== 前端页面（与 API 同源） =====================
+   放在所有 /api 路由之后：接口优先，静态文件兜底，互不抢路径。
+   好处是同源，浏览器不发跨域预检，前端自动探测到同源 /api 就走后端模式。 */
+
+app.use(express.static(WEB_ROOT, {
+  index: 'index.html',
+  etag: true,
+  maxAge: '1h',
+  setHeaders(res, filePath) {
+    // 页面本身不缓存，改完刷新就能看到新版；图片等资源可以缓存
+    if (path.basename(filePath) === 'index.html') res.setHeader('Cache-Control', 'no-cache');
+  }
+}));
+
+app.use('/api', (req, res) => fail(res, 404, '接口不存在：' + req.method + ' ' + req.originalUrl));
+
+// 其余路径回到首页（前端是单页应用）
+app.get('*', (req, res) => {
+  const home = path.join(WEB_ROOT, 'index.html');
+  if (fs.existsSync(home)) return res.sendFile(home);
+  res.status(404).type('text/plain; charset=utf-8').send('前端页面未打包进镜像：请检查 Dockerfile 是否 COPY 了 index.html');
+});
+
 app.use((err, req, res, next) => {
   console.error('[unhandled]', err && (err.stack || err.message || err));
   if (res.headersSent) return next(err);
@@ -499,6 +536,7 @@ async function main() {
     console.log('  端口     :', PORT);
     console.log('  存储驱动 :', driver.name + (driver.file ? ' -> ' + driver.file : ''));
     console.log('  集合     :', COLLECTION);
+    console.log('  前端目录 :', WEB_ROOT, fs.existsSync(path.join(WEB_ROOT, 'index.html')) ? '(已托管)' : '(缺少 index.html，仅提供 API)');
     console.log('  账号数   :', Object.keys(state.users).length, ' 消息数:', state.messages.length);
   });
 }
