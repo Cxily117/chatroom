@@ -44,6 +44,23 @@ button,input,textarea{font-family:inherit}
 .switch-line{margin-top:18px;text-align:center;font-size:13px;color:var(--muted)}
 .switch-line a{color:var(--primary);font-weight:650;text-decoration:none;cursor:pointer}
 .switch-line a:hover{text-decoration:underline}
+/* 本机已注册账号列表 */
+.known-box{margin-top:16px;border-top:1px dashed var(--border);padding-top:14px}
+.known-title{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px}
+.known-title b{font-weight:650;color:var(--text)}
+.known-list{max-height:132px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.known-empty{font-size:12px;color:var(--muted);padding:8px 10px;background:var(--soft);border-radius:10px;text-align:center}
+.known-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border:1px solid var(--border);
+  border-radius:11px;cursor:pointer;transition:.14s;background:var(--card)}
+.known-item:hover{border-color:var(--primary);background:var(--soft);transform:translateX(2px)}
+.known-item .ki-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;overflow:hidden;display:flex;
+  align-items:center;justify-content:center;background:var(--primary);color:#fff;font-size:13px;font-weight:700}
+.known-item .ki-av img{width:100%;height:100%;display:block;object-fit:cover}
+.known-item .ki-meta{flex:1;min-width:0}
+.known-item .ki-nick{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.known-item .ki-user{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.known-item .ki-go{font-size:11px;color:var(--primary);font-weight:650;flex-shrink:0}
+.known-note{font-size:11px;color:var(--muted);line-height:1.6;margin-top:9px}
 
 /* 聊天页 */
 .chat{display:flex;height:100vh}
@@ -914,6 +931,11 @@ window.CHAT_CONFIG = {
       <div id="entryErr" class="err"></div>
       <button id="btnEnter" class="btn">登录并进入</button>
       <div class="switch-line">还没有账号？<a id="goRegister">立即注册</a></div>
+      <div class="known-box">
+        <div class="known-title"><b>本机已注册的账号</b><span id="knownCount"></span></div>
+        <div class="known-list" id="knownList"></div>
+        <div class="known-note" id="knownNote"></div>
+      </div>
     </div>
 
     <!-- 注册视图 -->
@@ -1188,7 +1210,7 @@ var VOICE = {
 /* 安全存储：localStorage → sessionStorage → Cookie → window.name → 内存 依次降级。
    预览面板常禁用 localStorage，window.name 在同一标签页刷新后仍保留，尽量让账号/消息刷新不丢。 */
 var SafeLS = (function(){
-  var bag = {}, backend = 'memory', active = null;
+  var bag = {}, backend = 'memory', active = [];
   var P = 'spark_chat_'; // 本程序占用的键前缀，保存时先清掉旧键再写入，保证删除同步生效
   var C = [
     { name:'local', level:2,
@@ -1210,15 +1232,24 @@ var SafeLS = (function(){
   ];
   for(var i=0;i<C.length;i++){
     if(C[i].available && !C[i].available()) continue;
-    try{ bag=C[i].load(); active=C[i]; backend=C[i].name; break; }catch(e){}
+    active.push(C[i]);
+    // 合并各后端数据：后读到的只补空缺，高优先级（local）不被低优先级覆盖
+    try{ var d=C[i].load(); Object.keys(d).forEach(function(k){ if(!(k in bag)) bag[k]=d[k]; }); }catch(e){}
   }
-  function persist(){ if(!active) return; try{ active.save(bag); }catch(e){ active=null; backend='memory'; } }
+  backend = active.length ? active[0].name : 'memory';
+  // 一次写入所有可用后端，避免下次因某个后端不可用而“丢账号”
+  function persist(){
+    if(!active.length){ backend='memory'; return; }
+    active.forEach(function(b){ try{ b.save(bag); }catch(e){} });
+  }
   return {
     backend:function(){ return backend; },
-    level:function(){ return active?active.level:0; },
+    level:function(){ return active.length?active[0].level:0; },
     getItem:function(k){ return (k in bag)?bag[k]:null; },
     setItem:function(k,v){ bag[k]=String(v); persist(); },
-    removeItem:function(k){ delete bag[k]; persist(); }
+    removeItem:function(k){ delete bag[k]; persist(); },
+    raw:function(){ return bag; },
+    adopt:function(obj){ if(obj && typeof obj==='object'){ Object.keys(obj).forEach(function(k){ bag[k]=obj[k]; }); persist(); } }
   };
 })();
 
@@ -2120,6 +2151,48 @@ function setModeUI(){
   var b=$('badge');
   b.textContent = cloud ? '☁ 云端数据库' : '💾 本地存储';
   b.className = 'badge' + (cloud?'':' local');
+  renderKnownAccounts();
+}
+
+/* 登录页：列出本机已注册账号，点一下自动填好账号，避免记不住随机账号名 */
+function renderKnownAccounts(){
+  var list=$('knownList'), cnt=$('knownCount'), note=$('knownNote');
+  if(!list) return;
+  var users;
+  try{ users=Auth.users(); }catch(e){ users={}; }
+  var keys=Object.keys(users).sort(function(a,b){
+    return String((users[b].createdAt)||'').localeCompare(String(users[a].createdAt)||'');
+  });
+  cnt.textContent = keys.length ? ('共 '+keys.length+' 个') : '';
+  if(!keys.length){
+    list.innerHTML='<div class="known-empty">还没有注册记录，点上面「立即注册」创建第一个账号</div>';
+  }else{
+    list.innerHTML=keys.map(function(k){
+      var rec=users[k]||{}, nick=rec.nickname||k, av=getAvatar(k);
+      var avHTML;
+      if(av && av.type==='image' && safeDataURL(av.value)) avHTML='<img src="'+esc(av.value)+'" alt="">';
+      else if(av && av.type==='preset') avHTML='<img src="'+presetImg(av.v)+'" alt="">';
+      else avHTML=esc(nick.slice(0,1));
+      return '<div class="known-item" data-u="'+esc(k)+'" title="点击填入这个账号">'
+        +'<span class="ki-av">'+avHTML+'</span>'
+        +'<span class="ki-meta"><span class="ki-nick">'+esc(nick)+'</span><span class="ki-user">@'+esc(k)+'</span></span>'
+        +'<span class="ki-go">填入 →</span></div>';
+    }).join('');
+    list.querySelectorAll('.known-item').forEach(function(it){
+      it.addEventListener('click',function(){
+        var u=it.getAttribute('data-u');
+        $('loginUser').value=u;
+        $('loginPass').value='';
+        $('entryErr').textContent='';
+        $('loginPass').focus();
+        toast('已填入账号 @'+u+'，输入密码即可登录','ok');
+      });
+    });
+  }
+  var label={local:'浏览器本地存储',session:'本次会话存储',cookie:'浏览器 Cookie',name:'标签页临时存储',memory:'内存（刷新会清空）'}[SafeLS.backend()]||'本地存储';
+  note.innerHTML = Store.mode==='cloud'
+    ? '当前为云端模式，账号会同步到云数据库。'
+    : '这些账号保存在<b>'+esc(label)+'</b>里。当前未填云端环境 ID，属于本地模式；若清理浏览器数据或换设备 / 换浏览器，记录不会跟随。';
 }
 
 function enter(me){
@@ -2806,6 +2879,7 @@ function exitChat(){
   $('loginUser').value=''; $('loginPass').value=''; $('entryErr').textContent='';
   $('regUser').value=''; $('regPass').value=''; $('regPass2').value=''; $('regNick').value='';
   showView('login');
+  renderKnownAccounts();   // 退出到登录页时刷新本机账号记录
 }
 
 function loadCloudSDK(cb){
@@ -2911,6 +2985,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!r.ok){ $('regErr').textContent=r.error; return; }
     $('regErr').textContent='';
     $('btnRegister').disabled=true;
+    renderKnownAccounts();   // 注册成功后立刻让新账号出现在登录列表
     enter(r.me);
     $('btnRegister').disabled=false;
   });
