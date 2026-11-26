@@ -200,6 +200,213 @@ button,input,textarea{font-family:inherit}
   .nav{text-align:center}.head,.msgs,.composer{padding-left:14px;padding-right:14px}.body{max-width:84%}
   .imgbtn{padding:0 11px;font-size:13px}.toolbar{gap:6px}.toolbar .imgbtn{padding:0 9px;font-size:12px}
   .fr-ops{flex-direction:column}}
+/* ==================== 设计系统 v2：变量 / 层级 / 暗色主题 ==================== */
+:root{
+  --surface:#f7f8fc; --field:#fbfbfe; --hover:#f3f4fa; --av-bg:#e9eaf2;
+  --border2:#d8dbe8; --glow1:#e9e5ff; --glow2:#dfefff;
+  --shadow-xs:0 1px 3px rgba(31,35,51,.05);
+  --shadow-sm:0 4px 14px rgba(31,35,51,.07);
+  --shadow-md:0 12px 32px rgba(31,35,51,.10);
+  --shadow-lg:0 24px 60px rgba(70,55,140,.15);
+  --r-xs:8px; --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:26px;
+  --ease:cubic-bezier(.22,.61,.36,1); --dur:.22s;
+}
+html[data-theme="dark"]{
+  --primary:#8b7cff; --primary2:#6d5efc; --soft:#2b2549; --bg:#11131c;
+  --card:#1b1e2b; --text:#e9ebf5; --muted:#9299b2; --border:#2e3244; --border2:#3a3f55;
+  --ai:#272340; --surface:#222634; --field:#202431; --hover:#282c3c; --av-bg:#2c3042;
+  --glow1:#2a2350; --glow2:#152845;
+  --shadow-xs:0 1px 3px rgba(0,0,0,.28);
+  --shadow-sm:0 4px 14px rgba(0,0,0,.32);
+  --shadow-md:0 12px 32px rgba(0,0,0,.40);
+  --shadow-lg:0 24px 60px rgba(0,0,0,.52);
+}
+/* 暗色：把早期写死的浅色面统一换成主题变量 */
+html[data-theme="dark"] .entry{background:radial-gradient(circle at 18% 12%,#241f45 0%,transparent 42%),radial-gradient(circle at 85% 88%,#152a48 0%,transparent 42%),var(--bg)}
+html[data-theme="dark"] .nick-input,
+html[data-theme="dark"] #input,
+html[data-theme="dark"] .fr-search input{background:var(--field);color:var(--text);border-color:var(--border)}
+html[data-theme="dark"] .me,
+html[data-theme="dark"] .dbtab th,
+html[data-theme="dark"] .fr-note{background:var(--surface)}
+html[data-theme="dark"] .nav:hover{background:var(--hover)}
+html[data-theme="dark"] .mav{background:var(--av-bg);color:var(--muted)}
+html[data-theme="dark"] .imgbtn,
+html[data-theme="dark"] .btn-quiet,
+html[data-theme="dark"] .fr-tab,
+html[data-theme="dark"] .fr-row,
+html[data-theme="dark"] .fr-btn,
+html[data-theme="dark"] .file-card{background:var(--card);color:var(--text);border-color:var(--border)}
+html[data-theme="dark"] .dbtab,
+html[data-theme="dark"] .bubble{background:var(--card);border-color:var(--border)}
+html[data-theme="dark"] .dbtab th,html[data-theme="dark"] .dbtab td{border-color:var(--border)}
+html[data-theme="dark"] .dbtab .mono,html[data-theme="dark"] .del,html[data-theme="dark"] .op-del{color:var(--muted)}
+html[data-theme="dark"] .badge.local{background:#3a3016;color:#eac46c}
+html[data-theme="dark"] .msg.mine .bubble{border-color:var(--primary2)}
+html[data-theme="dark"] .fr-btn.pri,
+html[data-theme="dark"] .fr-tab.active,
+html[data-theme="dark"] .fr-search button,
+html[data-theme="dark"] .file-dl{background:var(--primary2);border-color:var(--primary2);color:#fff}
+html[data-theme="dark"] .lightbox{background:rgba(6,7,12,.92)}
+html[data-theme="dark"] .img-cap,html[data-theme="dark"] .file-size{color:var(--text)}
+/* 亮色下的质感增强 */
+.card{border-radius:var(--r-xl);box-shadow:var(--shadow-lg)}
+.head{box-shadow:var(--shadow-xs)}
+.composer{box-shadow:0 -6px 26px rgba(31,35,51,.035)}
+.bubble{box-shadow:var(--shadow-xs);border-radius:var(--r-md)}
+.msg.mine .bubble{border-bottom-right-radius:5px}
+.msg:not(.mine) .bubble{border-bottom-left-radius:5px}
+.fr-row,.file-card,.dbtab{box-shadow:var(--shadow-xs)}
+.fr-row{transition:box-shadow var(--dur) var(--ease),transform var(--dur) var(--ease)}
+.fr-row:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+.nav.active{box-shadow:inset 3px 0 0 var(--primary)}
+/* 主题切换时的平滑过渡 */
+body,.card,.side,.head,.composer,.bubble,.me,.nav,.dbtab,.fr-row,.fr-tab,.imgbtn,.btn-quiet,
+.nick-input,#input,.badge,.theme-btn,.file-card,.fr-btn,.fr-search input,.dbtab th{
+  transition:background-color .28s var(--ease),color .28s var(--ease),border-color .28s var(--ease),
+             box-shadow .28s var(--ease),transform .28s var(--ease)}
+/* ==================== 组件：图标 / 主题按钮 / 滚动条 / Toast / 确认框 ==================== */
+.ic{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.logo .ic{width:27px;height:27px;stroke-width:1.6}
+.logo.sm .ic{width:20px;height:20px;stroke-width:1.7}
+.nav,.btn-quiet,.imgbtn{display:flex;align-items:center;gap:10px}
+.nav .ic{width:17px;height:17px;opacity:.72;transition:opacity var(--dur)}
+.nav.active .ic,.nav:hover .ic{opacity:1}
+.btn-quiet .ic,.imgbtn .ic{width:16px;height:16px}
+.imgbtn{justify-content:center}
+.head-ops{display:flex;align-items:center;gap:10px}
+.theme-btn{width:36px;height:36px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);border-radius:50%;background:var(--card);color:var(--muted);cursor:pointer}
+.theme-btn:hover{color:var(--primary);border-color:var(--primary);transform:rotate(-18deg)}
+.theme-btn .ic{width:17px;height:17px}
+.theme-btn .ic-sun,.theme-btn.is-dark .ic-moon{display:none}
+.theme-btn.is-dark .ic-sun{display:block}
+#btnThemeEntry{position:absolute;top:20px;right:20px;z-index:2}
+/* 自定义滚动条 */
+.msgs::-webkit-scrollbar,.side::-webkit-scrollbar,.dbwrap::-webkit-scrollbar{width:9px;height:9px}
+.msgs::-webkit-scrollbar-track,.side::-webkit-scrollbar-track{background:transparent}
+.msgs::-webkit-scrollbar-thumb,.side::-webkit-scrollbar-thumb,.dbwrap::-webkit-scrollbar-thumb{
+  background:var(--border2);border-radius:9px;border:2px solid var(--card)}
+.msgs::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+/* 轻提示 */
+.toast-wrap{position:fixed;top:18px;right:18px;z-index:120;display:flex;flex-direction:column;gap:9px;
+  pointer-events:none;max-width:min(360px,calc(100vw - 36px))}
+.toast{padding:12px 16px;border-radius:var(--r-sm);background:var(--card);color:var(--text);
+  border:1px solid var(--border);border-left:3px solid var(--primary);box-shadow:var(--shadow-md);
+  font-size:13px;line-height:1.55;animation:toastIn .28s var(--ease) both}
+.toast.ok{border-left-color:var(--ok)}
+.toast.err{border-left-color:var(--danger)}
+.toast.out{animation:toastOut .26s var(--ease) both}
+@keyframes toastIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(18px)}}
+/* 确认框 */
+.modal{position:fixed;inset:0;z-index:130;background:rgba(18,18,30,.48);display:flex;
+  align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+.modal-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:26px 24px 20px;box-shadow:var(--shadow-lg);text-align:center;
+  animation:zoomIn .26s var(--ease)}
+.modal-badge{width:46px;height:46px;margin:0 auto 14px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;background:var(--soft);color:var(--primary)}
+.modal-badge .ic{width:23px;height:23px}
+.modal-msg{font-size:14px;line-height:1.7;color:var(--text);white-space:pre-line}
+.modal-ops{display:flex;gap:10px;margin-top:22px}
+.mbtn{flex:1;padding:11px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--card);
+  color:var(--muted);font-size:14px;font-weight:600;cursor:pointer;transition:.18s}
+.mbtn:hover{border-color:var(--primary);color:var(--primary)}
+.mbtn.pri{background:var(--primary2);border-color:var(--primary2);color:#fff}
+.mbtn.pri:hover{filter:brightness(1.08);color:#fff}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes zoomIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+/* ==================== 动效：入场 / 切换 / 涟漪 / 正在输入 ==================== */
+@keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.msg.enter{animation:msgIn .34s var(--ease) both}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#msgs.swap{animation:viewIn .26s var(--ease)}
+@keyframes sendPop{50%{transform:scale(1.07)}}
+.send.sent{animation:sendPop .4s var(--ease)}
+.btn,.send,.imgbtn,.fr-btn,.fr-tab,.mbtn,.theme-btn{position:relative;overflow:hidden}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.38);transform:scale(0);
+  animation:ripple .55s linear forwards;pointer-events:none}
+.mbtn:not(.pri) .ripple,.fr-btn:not(.pri) .ripple,.fr-tab:not(.active) .ripple,
+.imgbtn .ripple,.theme-btn .ripple{background:rgba(109,94,252,.18)}
+@keyframes ripple{to{transform:scale(2.6);opacity:0}}
+.lightbox.show{animation:fadeIn .2s ease}
+.lightbox.show img{animation:zoomIn .26s var(--ease)}
+@keyframes typing{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion: reduce){
+  .msg.enter,#msgs.swap,.lightbox.show,.lightbox.show img,.toast,.modal,.modal-card,.send.sent,
+  .typing .bubble i,.sk-av,.sk-lines i{animation:none}
+}
+/* ==================== 气泡精修：小尾巴 / 头像配色 / 时间分组 / 连续合并 ==================== */
+.bubble{position:relative}
+.bubble:not(.hasimg):not(.hasatt)::after{content:"";position:absolute;bottom:0;left:-5px;width:11px;height:11px;
+  background:inherit;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.msg.mine .bubble:not(.hasimg):not(.hasatt)::after{left:auto;right:-5px;clip-path:polygon(0 0,0 100%,100% 100%)}
+.msg .mav.av-0{background:linear-gradient(135deg,#7c6cff,#5a49f0);color:#fff}
+.msg .mav.av-1{background:linear-gradient(135deg,#ff9f7a,#f2664a);color:#fff}
+.msg .mav.av-2{background:linear-gradient(135deg,#4fc3a1,#199e79);color:#fff}
+.msg .mav.av-3{background:linear-gradient(135deg,#5aa9f5,#3b72d9);color:#fff}
+.msg .mav.av-4{background:linear-gradient(135deg,#f4a7cf,#d9549b);color:#fff}
+.msg .mav.av-5{background:linear-gradient(135deg,#f3c46b,#d99127);color:#fff}
+.msg .mav.av-6{background:linear-gradient(135deg,#8fa0e8,#5c6bc0);color:#fff}
+.msg .mav.av-7{background:linear-gradient(135deg,#6fcbd8,#2f98ab);color:#fff}
+.msg .mav.av-sys{background:linear-gradient(135deg,#a2aac0,#737c95);color:#fff}
+.day-sep{display:flex;align-items:center;gap:12px;margin:14px 0 18px;color:var(--muted);font-size:11px}
+.day-sep:before,.day-sep:after{content:"";flex:1;height:1px;background:var(--border)}
+.day-sep span{padding:3px 10px;border:1px solid var(--border);border-radius:20px;background:var(--surface)}
+.msg.tight{margin-bottom:7px}
+.msg.tight .mav{visibility:hidden}
+.msg.tight .who{display:none}
+.msg.tight .bubble{border-top-left-radius:6px}
+.msg.mine.tight .bubble{border-top-left-radius:var(--r-md);border-top-right-radius:6px}
+.meta{display:flex;align-items:center;gap:6px;min-height:16px}
+.msg.mine .meta{justify-content:flex-end}
+.mtime{opacity:.8}
+.op-del{border:none;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;
+  padding:1px 5px;border-radius:6px;opacity:.4;
+  transition:opacity var(--dur),color var(--dur),background var(--dur)}
+.msg:hover .op-del{opacity:1}
+.op-del:hover{color:var(--danger);background:var(--surface)}
+@media (hover:none){.op-del{opacity:.85}}
+/* ==================== 空状态 / 骨架屏 / 正在输入 ==================== */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:48px 0}
+.empty-art{width:112px;height:84px}
+.empty-txt{font-size:13px;color:var(--muted)}
+.typing .bubble{display:flex;align-items:center;gap:5px;padding:14px 16px}
+.typing .bubble i{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:typing 1.2s infinite}
+.typing .bubble i:nth-child(2){animation-delay:.18s}
+.typing .bubble i:nth-child(3){animation-delay:.36s}
+.skeleton{padding:12px 0}
+.sk-row{display:flex;gap:12px;margin-bottom:22px;align-items:flex-start}
+.sk-row.right{flex-direction:row-reverse}
+.sk-av{width:34px;height:34px;border-radius:50%;flex-shrink:0}
+.sk-lines{flex:1;max-width:56%}
+.sk-lines i{display:block;height:12px;border-radius:6px;margin-bottom:8px}
+.sk-lines i:last-child{width:62%}
+.sk-av,.sk-lines i{background:linear-gradient(90deg,var(--surface) 25%,var(--hover) 50%,var(--surface) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s infinite}
+/* ==================== 响应式：手机端用图标栏 + 抽屉式留白 ==================== */
+@media(max-width:720px){
+  .side{width:66px;padding:14px 8px}
+  .side .sec-label,.side .me>div:not(.avatar),.side .nav span,
+  .side .side-head>div:not(.logo),.btn-quiet span{display:none}
+  .side .nav{justify-content:center;padding:12px 0;gap:0}
+  .side .btn-quiet{justify-content:center}
+  .side .me{justify-content:center;padding:8px}
+  .head,.msgs,.composer{padding-left:14px;padding-right:14px}
+  .body{max-width:84%}
+  .frwrap{max-width:100%}
+  .fr-ops{flex-direction:column}
+  .entry{padding:14px}
+  .card{padding:34px 24px 26px}
+  #btnThemeEntry{top:14px;right:14px}
+  .toast-wrap{top:12px;right:12px;left:12px;max-width:none}
+  .head-ops{gap:6px}
+  .badge{font-size:11px;padding:5px 9px}
+  .dbtab{font-size:11px}
+  .dbtab th,.dbtab td{padding:8px 7px}
+}
 </style>
 <script>
 /* 如需接云端：把下面 env 改成你的腾讯云环境 ID；留空 = 本地存储模式（也能完整体验） */
@@ -214,14 +421,44 @@ window.CHAT_CONFIG = {
   maxFileBytes: 512*1024,  // 单个附件上限（本地存储容量有限，云端可放宽）
   maxVoiceSec: 60          // 单次录音最长秒数
 };
+/* 主题引导：在页面绘制前定好亮/暗，避免刷新时闪一下白屏 */
+(function(){
+  var t=null;
+  try{ t=window.localStorage.getItem('spark_chat_theme_v1'); }catch(e){}
+  if(t!=='dark' && t!=='light'){
+    t=(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  document.documentElement.setAttribute('data-theme', t);
+})();
 </script>
 </head>
 <body>
 
+<!-- 线性图标精灵：统一图标语言，替代 emoji -->
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.4 3.8 5.5 3.8 9S14.5 18.6 12 21c-2.5-2.4-3.8-5.5-3.8-9S9.5 5.4 12 3z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c.5-3.6 3.4-5.8 7.2-5.8s6.7 2.2 7.2 5.8"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5l2.1 6.4 6.4 2.1-6.4 2.1L12 19.5l-2.1-6.4L3.5 11l6.4-2.1L12 2.5z"/><path d="M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8L19 17z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19c.4-3.2 2.9-5.2 6.2-5.2s5.8 2 6.2 5.2"/><path d="M16 5.2a3.2 3.2 0 0 1 0 6.1M17.5 14.2c2.2.6 3.6 2.3 3.9 4.8"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 2.5.9-3.6A7.5 7.5 0 1 1 20 11.5z"/><path d="M8.5 11.5h7"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v13c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-13"/><path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3"/></symbol>
+  <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M15 8l4 4-4 4M19 12H9"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.6"/><path d="M4 17l4.8-4.6 3.4 3.1 3-2.7L20 17"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M13.5 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9.5L13.5 3z"/><path d="M13.5 3v6.5H20"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.4A8.6 8.6 0 0 1 9.6 3.5a8.6 8.6 0 1 0 10.9 10.9z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.8.3-1.3.9-1.3 1.8v.4"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
+</svg>
+
 <!-- ==================== 登录 / 注册界面 ==================== -->
 <div id="entry" class="entry">
   <div class="card">
-    <div class="brand"><div class="logo">✦</div><div>
+    <button class="theme-btn" id="btnThemeEntry" title="切换亮 / 暗主题" aria-label="切换主题">
+      <svg class="ic ic-moon"><use href="#i-moon"></use></svg><svg class="ic ic-sun"><use href="#i-sun"></use></svg>
+    </button>
+    <div class="brand"><div class="logo"><svg class="ic"><use href="#i-spark"></use></svg></div><div>
       <div class="bname">星火聊天室</div><div class="bsub">登录后进入 · 账号级隔离</div>
     </div></div>
 
@@ -260,7 +497,7 @@ window.CHAT_CONFIG = {
 <!-- ==================== 聊天室 ==================== -->
 <div id="chat" class="chat" style="display:none">
   <aside class="side">
-    <div class="side-head"><div class="logo sm">✦</div><div>
+    <div class="side-head"><div class="logo sm"><svg class="ic"><use href="#i-spark"></use></svg></div><div>
       <div class="bname" style="font-size:16px">星火聊天室</div><div class="bsub">群聊 · 腾讯云版</div>
     </div></div>
     <div class="sec-label">当前身份</div>
@@ -268,29 +505,34 @@ window.CHAT_CONFIG = {
       <div class="me-name" id="meName">—</div><div class="me-id" id="meId">—</div>
     </div></div>
     <div class="sec-label">视图</div>
-    <button class="nav active" id="navAll">🌐 群聊大厅</button>
-    <button class="nav" id="navMine">🔒 个人</button>
+    <button class="nav active" id="navAll"><svg class="ic"><use href="#i-globe"></use></svg><span>群聊大厅</span></button>
+    <button class="nav" id="navMine"><svg class="ic"><use href="#i-user"></use></svg><span>个人</span></button>
     <div class="sec-label">智能助手</div>
-    <button class="nav ai" id="navAi" title="点一下自动 @小星 并发送">✦ 小星 · @ 它接话</button>
+    <button class="nav ai" id="navAi" title="点一下自动 @小星 并发送"><svg class="ic"><use href="#i-spark"></use></svg><span>小星 · @ 它接话</span></button>
     <div class="sec-label">社交</div>
-    <button class="nav" id="navFriends">👥 好友</button>
-    <button class="nav" id="navPm" style="display:none">💬 私聊</button>
+    <button class="nav" id="navFriends"><svg class="ic"><use href="#i-users"></use></svg><span>好友</span></button>
+    <button class="nav" id="navPm" style="display:none"><svg class="ic"><use href="#i-chat"></use></svg><span>私聊</span></button>
     <div class="sec-label">数据</div>
-    <button class="nav" id="navDb">🗄 数据库</button>
-    <div class="side-foot"><button class="btn-quiet" id="btnExit">退出</button></div>
+    <button class="nav" id="navDb"><svg class="ic"><use href="#i-db"></use></svg><span>数据库</span></button>
+    <div class="side-foot"><button class="btn-quiet" id="btnExit"><svg class="ic"><use href="#i-exit"></use></svg><span>退出</span></button></div>
   </aside>
   <main class="main">
     <header class="head"><div>
       <div class="title" id="chatTitle">群聊大厅</div>
       <div class="desc" id="chatDesc"></div>
-    </div><div class="badge" id="badge">检测中</div></header>
+    </div><div class="head-ops">
+      <div class="badge" id="badge">检测中</div>
+      <button class="theme-btn" id="btnTheme" title="切换亮 / 暗主题" aria-label="切换主题">
+        <svg class="ic ic-moon"><use href="#i-moon"></use></svg><svg class="ic ic-sun"><use href="#i-sun"></use></svg>
+      </button>
+    </div></header>
     <div class="msgs" id="msgs"></div>
     <div class="composer">
       <div class="tip" id="tip"></div>
       <div class="toolbar">
-        <button class="imgbtn" id="btnImg" title="发送图片（自动压缩）">🖼 图片</button>
-        <button class="imgbtn" id="btnFile" title="上传任意文件（本地演示建议小于 500KB）">📎 文件</button>
-        <button class="imgbtn" id="btnVoice" title="录音发语音；不支持时可选择音频文件">🎤 语音</button>
+        <button class="imgbtn" id="btnImg" title="发送图片（自动压缩）"><svg class="ic"><use href="#i-image"></use></svg><span>图片</span></button>
+        <button class="imgbtn" id="btnFile" title="上传任意文件（本地演示建议小于 500KB）"><svg class="ic"><use href="#i-file"></use></svg><span>文件</span></button>
+        <button class="imgbtn" id="btnVoice" title="录音发语音；不支持时可选择音频文件"><svg class="ic"><use href="#i-mic"></use></svg><span id="voiceLabel">语音</span></button>
         <span class="rec-hint" id="recHint" style="display:none">录音中 0s · 再点停止发送</span>
       </div>
       <div class="crow">
@@ -308,6 +550,19 @@ window.CHAT_CONFIG = {
 <div id="lightbox" class="lightbox" style="display:none">
   <img id="lightboxImg" src="" alt="图片预览">
   <div class="lbtip">点击任意处关闭</div>
+</div>
+
+<!-- 轻提示与确认框：取代原生 alert / confirm，避免预览面板被弹窗阻塞 -->
+<div id="toastWrap" class="toast-wrap" aria-live="polite"></div>
+<div id="modal" class="modal" style="display:none">
+  <div class="modal-card">
+    <div class="modal-badge"><svg class="ic"><use href="#i-help"></use></svg></div>
+    <div class="modal-msg" id="modalMsg"></div>
+    <div class="modal-ops">
+      <button class="mbtn" id="modalCancel">取消</button>
+      <button class="mbtn pri" id="modalOk">确定</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -784,7 +1039,7 @@ var AI = {
     if(/你是谁|介绍|什么功能|能做什么/.test(s))
       return '我是小星 ✦ 这个聊天室支持：账号注册登录、群聊大厅、发图片/文件/语音、加好友与私聊、「个人」视图、owner_id 归属隔离、60 秒 8 条限流，还有我在线答疑。';
     if(/文件|上传|附件|语音|录音|好友|私聊|加好友/.test(s))
-      return '工具栏有 🖼图片 / 📎文件 / 🎤语音 三个按钮；侧栏「👥 好友」可以搜索账号、发申请、同意后私聊。私聊消息带 toUid，群聊大厅严格过滤，不会串消息。';
+      return '工具栏有「图片 / 文件 / 语音」三个按钮；侧栏「好友」可以搜索账号、发申请、同意后私聊。私聊消息带 toUid，群聊大厅严格过滤，不会串消息。';
     if(/架构|技术|前后端|什么语言|怎么实现/.test(s))
       return '发布到腾讯云开发「网站托管」：前端是原生 HTML/CSS/JS，数据存在云数据库（填 env 后自动切换），未配置环境时自动用浏览器本地存储做演示。';
     if(/数据库|表|集合|存哪/.test(s))
@@ -830,6 +1085,102 @@ var AI = {
 var state={ me:null, scope:'all', timer:null, asking:false, composing:false,
   frTab:'friends', frQuery:'', pmPeer:null, _audio:null, _playBtn:null };
 
+/* ===== 视觉组件：主题 / Toast / 确认框 / 渲染辅助 ===== */
+var SEEN = {};        // 已渲染过的 mid：只有新消息才播入场动画，轮询重绘不闪
+var LAST_SCOPE = null; // 上次渲染的视图，用于切换视图时回到最新消息
+var _modalCb = null, _modalCancel = null;
+function toast(msg, type){
+  var w=$('toastWrap'); if(!w) return;
+  var t=document.createElement('div');
+  t.className='toast '+(type||'info');
+  t.textContent=String(msg||'');
+  w.appendChild(t);
+  setTimeout(function(){
+    t.classList.add('out');
+    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },280);
+  },2600);
+}
+function confirmBox(msg, onOk, onCancel){
+  var m=$('modal');
+  if(!m){ if(window.confirm(msg) && onOk) onOk(); return; }
+  $('modalMsg').textContent=msg;
+  _modalCb=onOk||function(){};
+  _modalCancel=onCancel||null;
+  m.style.display='flex';
+}
+function closeModal(ok){
+  $('modal').style.display='none';
+  var cb=_modalCb, cc=_modalCancel;
+  _modalCb=null; _modalCancel=null;
+  if(ok){ if(cb) cb(); } else if(cc) cc();
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  var dark=t==='dark';
+  ['btnTheme','btnThemeEntry'].forEach(function(id){
+    var b=$(id); if(b) b.classList.toggle('is-dark',dark);
+  });
+}
+function initTheme(){
+  var t=null;
+  try{ t=SafeLS.getItem('spark_chat_theme_v1'); }catch(e){}
+  if(t!=='dark' && t!=='light'){
+    t=(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  }
+  applyTheme(t);
+}
+function toggleTheme(){
+  var cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+  var next=cur==='dark'?'light':'dark';
+  applyTheme(next);
+  try{ SafeLS.setItem('spark_chat_theme_v1',next); }catch(e){}
+  toast(next==='dark'?'已切换到暗色主题':'已切换到亮色主题','ok');
+}
+function avatarClass(m){
+  if(m.kind==='ai') return '';          // AI 保留品牌紫
+  if(m.kind==='system') return 'av-sys';
+  var s=String(m.ownerName||m.ownerId||'?'), h=0;
+  for(var i=0;i<s.length;i++){ h=((h<<5)-h+s.charCodeAt(i))|0; }
+  return 'av-'+(Math.abs(h)%8);        // 同一昵称永远同一种配色
+}
+function timeLabel(iso){
+  var d=new Date(iso); if(isNaN(d.getTime())) return '';
+  var now=new Date(), y=new Date(now.getTime()-86400000);
+  var hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+  if(d.toDateString()===now.toDateString()) return '今天 '+hm;
+  if(d.toDateString()===y.toDateString()) return '昨天 '+hm;
+  return (d.getMonth()+1)+'月'+d.getDate()+'日 '+hm;
+}
+function emptyHTML(txt){
+  return '<div class="empty"><svg class="empty-art" viewBox="0 0 120 90" fill="none" aria-hidden="true">'
+    + '<rect x="8" y="12" width="70" height="46" rx="14" style="fill:var(--card);stroke:var(--border2)" stroke-width="2"/>'
+    + '<circle cx="28" cy="34" r="3.5" style="fill:var(--primary)"/>'
+    + '<circle cx="42" cy="34" r="3.5" style="fill:var(--primary)" opacity=".6"/>'
+    + '<circle cx="56" cy="34" r="3.5" style="fill:var(--primary)" opacity=".35"/>'
+    + '<path d="M24 58l-6 12 16-12" style="fill:var(--card);stroke:var(--border2)" stroke-width="2" stroke-linejoin="round"/>'
+    + '<rect x="48" y="44" width="64" height="38" rx="12" style="fill:var(--soft);stroke:var(--border2)" stroke-width="2"/>'
+    + '<path d="M62 60h36M62 70h22" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>'
+    + '</svg><div class="empty-txt">'+esc(txt)+'</div></div>';
+}
+function skeletonHTML(){
+  var row=function(right){
+    return '<div class="sk-row'+(right?' right':'')+'"><div class="sk-av"></div>'
+      +'<div class="sk-lines"><i></i><i></i></div></div>';
+  };
+  return '<div class="skeleton">'+row(false)+row(true)+row(false)+'</div>';
+}
+function rippleDelegate(e){
+  var b=(e.target && e.target.closest) ? e.target.closest('.btn,.send,.imgbtn,.fr-btn,.fr-tab,.mbtn') : null;
+  if(!b) return;
+  var r=b.getBoundingClientRect(), d=Math.max(r.width,r.height)*1.2;
+  var s=document.createElement('span'); s.className='ripple';
+  s.style.width=s.style.height=d+'px';
+  s.style.left=(e.clientX-r.left-d/2)+'px';
+  s.style.top=(e.clientY-r.top-d/2)+'px';
+  b.appendChild(s);
+  setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); },600);
+}
+
 function setModeUI(){
   var cloud = Store.mode==='cloud';
   var label = {local:'浏览器本地存储',session:'本次会话存储',cookie:'浏览器 Cookie',name:'标签页临时存储',memory:'内存（刷新会清空）'}[SafeLS.backend()] || '本地存储';
@@ -849,6 +1200,7 @@ function enter(me){
   $('meName').textContent=me.nickname;
   $('meId').textContent='@'+me.username;
   $('meAvatar').textContent=me.nickname.slice(0,1);
+  $('msgs').innerHTML=skeletonHTML();   // 云端拉取期间先显示骨架屏
   seedWelcome();
   refresh();
   if(state.timer) clearInterval(state.timer);
@@ -859,7 +1211,7 @@ function seedWelcome(){
   Store.list().then(function(a){
     var has = a.some(function(m){ return m.kind==='system'; });
     if(!has){
-      return Store.add({ mid:uid(), ownerId:'system', ownerName:'系统', content:'欢迎来到星火聊天室！可以发图片/文件/语音，侧栏「👥 好友」能加好友私聊，「🗄 数据库」能看原始记录。想让小星接话，消息里带上 @小星 即可。', kind:'system', createdAt:nowISO() });
+      return Store.add({ mid:uid(), ownerId:'system', ownerName:'系统', content:'欢迎来到星火聊天室！可以发图片 / 文件 / 语音，侧栏「好友」能加好友私聊，「数据库」能看原始记录。想让小星接话，消息里带上 @小星 即可。还可以点右上角切换亮 / 暗主题。', kind:'system', createdAt:nowISO() });
     }
   }).then(refresh).catch(function(){});
 }
@@ -904,7 +1256,7 @@ function renderDb(list){
     + '共 <b>'+list.length+'</b> 条消息记录 · 每条消息都带 <span class="mono">ownerId</span> 归属字段，用于隔离与删除校验。'
     + (cloud ? '<br>同一集合还存有账号目录与好友关系（<span class="mono">kind=profile / social</span>），供跨设备加好友，不计入聊天消息。' : '')
     + '</div>';
-  if(!list.length){ box.innerHTML=head+'<div class="empty">数据库里还没有记录</div></div>'; return; }
+  if(!list.length){ box.innerHTML=head+emptyHTML('数据库里还没有记录')+'</div>'; return; }
   var rows=list.map(function(m){
     var k=(m.kind||'user');
     var kc = k==='system'?'system':(k==='ai'?'ai':'');
@@ -947,12 +1299,28 @@ function safeDataURL(s){ return (typeof s==='string' && s.indexOf('data:')===0) 
 
 function render(list){
   var box=$('msgs');
-  if(!list.length){ box.innerHTML='<div class="empty">还没有消息，来发第一条吧 ✨</div>'; return; }
+  if(!list.length){ box.innerHTML=emptyHTML('还没有消息，来发第一条吧'); return; }
+  // 用户正在往上翻历史时，轮询重绘不要把视线强行拉回底部；切换视图则回到最新消息
+  var forceBottom = LAST_SCOPE !== state.scope;
+  LAST_SCOPE = state.scope;
+  var atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 140;
   ATT_CACHE = {};
-  box.innerHTML = list.map(function(m){
+  var nextSeen={}, hasNew=false, prev=null, parts=[];
+  list.forEach(function(m,i){
     var mine = state.me && m.ownerId===state.me.id;
-    var cls='msg'+(mine?' mine':'')+(m.kind==='ai'?' ai':'');
-    var del = mine ? '<button class="del" data-mid="'+esc(m.mid)+'">删除</button>' : '';
+    var isNew = !SEEN[m.mid];
+    if(isNew) hasNew=true;
+    nextSeen[m.mid]=true;
+    // 时间分组：与上一条相隔超过 10 分钟就插一条日期分隔线
+    var tCur=new Date(m.createdAt).getTime();
+    var tPrev=prev?new Date(prev.createdAt).getTime():NaN;
+    var gap=(!isNaN(tCur)&&!isNaN(tPrev))?(tCur-tPrev):Infinity;
+    var sep=(i===0)||gap>10*60*1000;
+    if(sep) parts.push('<div class="day-sep"><span>'+esc(timeLabel(m.createdAt))+'</span></div>');
+    // 同一人 2 分钟内的连续消息：收起重复头像与昵称，收拢间距
+    var tight=!sep && prev && prev.ownerId===m.ownerId && prev.kind===m.kind && gap<2*60*1000;
+    var cls='msg'+(mine?' mine':'')+(m.kind==='ai'?' ai':'')+(tight?' tight':'')+(isNew?' enter':'');
+    var del = mine ? '<button class="op-del" data-mid="'+esc(m.mid)+'" title="删除这条消息">删除</button>' : '';
     var who = m.kind==='ai' ? '小星 · 智能助手'
             : m.kind==='system' ? '系统公告'
             : esc(m.ownerName);
@@ -975,7 +1343,7 @@ function render(list){
     }else if(m.audio && safeDataURL(m.audio.data)){
       ATT_CACHE[m.mid]={data:m.audio.data, name:'语音消息'};
       var dur=m.audio.dur||1;
-      var bars=''; for(var i=0;i<18;i++){ bars+='<i style="height:'+(5+((i*7+3)%15))+'px"></i>'; }
+      var bars=''; for(var j=0;j<18;j++){ bars+='<i style="height:'+(5+((j*7+3)%15))+'px"></i>'; }
       inner = '<div class="bubble hasatt"><div class="voice-card">'
             + '<button class="voice-play" data-play="'+esc(m.mid)+'" title="播放语音">▶</button>'
             + '<div class="voice-track"><div class="voice-bars">'+bars+'</div>'
@@ -983,16 +1351,27 @@ function render(list){
     }else{
       inner = '<div class="bubble">'+esc(m.content)+'</div>';
     }
-    return '<div class="'+cls+'"><div class="mav">'+esc((m.ownerName||'?').slice(0,1))+'</div>'+
-      '<div class="body"><div class="meta">'+who+pmTag+' &nbsp; '+hhmm(m.createdAt)+del+'</div>'+
-      inner+'</div></div>';
-  }).join('');
-  box.scrollTop=box.scrollHeight;
+    parts.push('<div class="'+cls+'"><div class="mav '+avatarClass(m)+'">'+esc((m.ownerName||'?').slice(0,1))+'</div>'+
+      '<div class="body"><div class="meta"><span class="who">'+who+'</span>'+pmTag+
+      '<span class="mtime">'+hhmm(m.createdAt)+'</span>'+del+'</div>'+inner+'</div></div>');
+    prev=m;
+  });
+  // 累积而非替换：切换视图再回来时，旧消息不会重播入场动画
+  Object.keys(nextSeen).forEach(function(k){ SEEN[k]=true; });
+  box.innerHTML=parts.join('');
+  // AI 思考中：插一条"正在输入"的临时气泡（不进 SEEN，不写入数据库）
+  if(state.asking && (state.scope==='all'||state.scope==='mine')){
+    box.insertAdjacentHTML('beforeend','<div class="msg ai typing"><div class="mav av-sys">✦</div><div class="body">'+
+      '<div class="meta"><span class="who">小星 · 智能助手</span><span class="mtime">正在输入</span></div>'+
+      '<div class="bubble"><i></i><i></i><i></i></div></div></div>');
+  }
+  if(forceBottom || atBottom || hasNew) box.scrollTop=box.scrollHeight;
   box.querySelectorAll('[data-mid]').forEach(function(b){
     b.addEventListener('click',function(){
-      if(!confirm('确定删除这条消息吗？只能删除自己的消息。')) return;
-      Store.remove(b.getAttribute('data-mid'), state.me.id).then(refresh)
-        .catch(function(e){ alert(e.message); });
+      confirmBox('确定删除这条消息吗？只能删除自己的消息。', function(){
+        Store.remove(b.getAttribute('data-mid'), state.me.id).then(refresh)
+          .catch(function(e){ toast(e.message,'err'); });
+      });
     });
   });
   box.querySelectorAll('.zoomable').forEach(function(im){
@@ -1002,7 +1381,7 @@ function render(list){
   box.querySelectorAll('[data-dl]').forEach(function(b){
     b.addEventListener('click',function(){
       var a=ATT_CACHE[b.getAttribute('data-dl')];
-      if(!a){ alert('附件已失效，请刷新'); return; }
+      if(!a){ toast('附件已失效，请刷新','err'); return; }
       var link=document.createElement('a');
       link.href=a.data; link.download=a.name; document.body.appendChild(link);
       link.click(); document.body.removeChild(link);
@@ -1012,20 +1391,22 @@ function render(list){
   box.querySelectorAll('[data-play]').forEach(function(b){
     b.addEventListener('click',function(){
       var a=ATT_CACHE[b.getAttribute('data-play')];
-      if(!a){ alert('语音已失效，请刷新'); return; }
+      if(!a){ toast('语音已失效，请刷新','err'); return; }
       if(state._audio){ try{ state._audio.pause(); }catch(e){} }
       if(state._playBtn){ state._playBtn.textContent='▶'; }
       var au=new Audio(a.data); state._audio=au; state._playBtn=b;
       b.textContent='⏸';
-      au.play().catch(function(e){ b.textContent='▶'; alert('播放失败：'+(e&&e.message)); });
+      au.play().catch(function(e){ b.textContent='▶'; toast('播放失败：'+(e&&e.message),'err'); });
       au.onended=function(){ b.textContent='▶'; state._audio=null; state._playBtn=null; };
     });
   });
 }
 
 function openLightbox(src){
+  var lb=$('lightbox');
   $('lightboxImg').src=src;
-  $('lightbox').style.display='flex';
+  lb.style.display='flex';
+  lb.classList.remove('show'); void lb.offsetWidth; lb.classList.add('show');
 }
 
 /* ===== 好友视图：搜索加好友 / 处理申请 / 好友列表 / 发起私聊 ===== */
@@ -1033,9 +1414,9 @@ function renderFriends(){
   var box=$('msgs'), me=state.me, tab=state.frTab||'friends';
   var incoming=Social.incoming(me), outgoing=Social.outgoing(me), friends=Social.friendsOf(me);
   var tabs = '<div class="fr-tabs">'
-    + '<button class="fr-tab'+(tab==='friends'?' active':'')+'" data-tab="friends">👥 好友 '+friends.length+'</button>'
-    + '<button class="fr-tab'+(tab==='find'?' active':'')+'" data-tab="find">🔍 找人</button>'
-    + '<button class="fr-tab'+(tab==='req'?' active':'')+'" data-tab="req">📨 申请'+(incoming.length?'<span class="cnt">'+incoming.length+'</span>':'')+'</button>'
+    + '<button class="fr-tab'+(tab==='friends'?' active':'')+'" data-tab="friends">好友 '+friends.length+'</button>'
+    + '<button class="fr-tab'+(tab==='find'?' active':'')+'" data-tab="find">找人</button>'
+    + '<button class="fr-tab'+(tab==='req'?' active':'')+'" data-tab="req">申请'+(incoming.length?'<span class="cnt">'+incoming.length+'</span>':'')+'</button>'
     + '</div>';
   var note = Store.mode==='cloud'
     ? '<div class="fr-note">当前是<b>云端数据库模式</b>：账号目录和好友关系已同步到云端。两台设备打开同一个网址、各自注册账号后，就能在「找人」里互相搜到、加好友、私聊（约 2~3 秒同步一次）。</div>'
@@ -1053,8 +1434,8 @@ function renderFriends(){
       h+='<div class="fr-row"><div class="fr-av">'+esc((r.fromName||'?').slice(0,1))+'</div>'
         +'<div class="fr-info"><div class="fr-nm">'+esc(r.fromName||r.from)+' 想加你为好友</div>'
         +'<div class="fr-id">@'+esc(r.from)+' · '+hhmm(r.createdAt)+'</div></div>'
-        +'<div class="fr-ops"><button class="fr-btn ok" data-accept="'+esc(r.id)+'">✓ 同意</button>'
-        +'<button class="fr-btn no" data-reject="'+esc(r.id)+'">✕ 拒绝</button></div></div>';
+        +'<div class="fr-ops"><button class="fr-btn ok" data-accept="'+esc(r.id)+'">同意</button>'
+        +'<button class="fr-btn no" data-reject="'+esc(r.id)+'">拒绝</button></div></div>';
     });
     h+='<div class="fr-sec">我发出的申请（'+outgoing.length+'）</div>';
     if(!outgoing.length) h+='<div class="fr-empty">还没有发出申请，去「找人」里添加吧</div>';
@@ -1067,12 +1448,12 @@ function renderFriends(){
     body=h;
   }else{
     var b='<div class="fr-sec">我的好友（'+friends.length+'）</div>';
-    if(!friends.length) b+='<div class="fr-empty">还没有好友，点「🔍 找人」添加第一个吧</div>';
+    if(!friends.length) b+='<div class="fr-empty">还没有好友，点上方「找人」添加第一个吧</div>';
     friends.forEach(function(f){
       b+='<div class="fr-row"><div class="fr-av">'+esc((f.nickname||'?').slice(0,1))+'</div>'
         +'<div class="fr-info"><div class="fr-nm">'+esc(f.nickname)+'</div>'
         +'<div class="fr-id">@'+esc(f.uid)+'</div></div>'
-        +'<div class="fr-ops"><button class="fr-btn pri" data-chat="'+esc(f.uid)+'" data-nick="'+esc(f.nickname)+'">💬 私聊</button>'
+        +'<div class="fr-ops"><button class="fr-btn pri" data-chat="'+esc(f.uid)+'" data-nick="'+esc(f.nickname)+'">私聊</button>'
         +'<button class="fr-btn no" data-unfriend="'+esc(f.uid)+'">删除</button></div></div>';
     });
     body=b;
@@ -1095,7 +1476,7 @@ function renderFriends(){
       var fr=Social.isFriend(me.uid,u.uid), sent=!!Social.pendingRequest(me.uid,u.uid);
       var op = fr ? '<span class="fr-btn" style="cursor:default">已是好友</span>'
         : sent ? '<span class="fr-btn" style="cursor:default">申请已发出</span>'
-        : '<button class="fr-btn pri" data-add="'+esc(u.uid)+'" data-nick="'+esc(u.nickname)+'">＋ 加好友</button>';
+        : '<button class="fr-btn pri" data-add="'+esc(u.uid)+'" data-nick="'+esc(u.nickname)+'">加好友</button>';
       return '<div class="fr-row"><div class="fr-av">'+esc((u.nickname||'?').slice(0,1))+'</div>'
         +'<div class="fr-info"><div class="fr-nm">'+esc(u.nickname)+'</div><div class="fr-id">@'+esc(u.uid)+'</div></div>'
         +'<div class="fr-ops">'+op+'</div></div>';
@@ -1103,8 +1484,8 @@ function renderFriends(){
     res.querySelectorAll('[data-add]').forEach(function(b){
       b.addEventListener('click',function(){
         var r=Social.request(me,{uid:b.getAttribute('data-add'),nickname:b.getAttribute('data-nick')});
-        if(!r.ok){ alert(r.error); return; }
-        if(r.auto){ alert('对方也向你发过申请，已自动成为好友！'); }else{ alert('好友申请已发出，等对方登录后在「申请」里同意'); }
+        if(!r.ok){ toast(r.error,'err'); return; }
+        if(r.auto){ toast('对方也向你发过申请，已自动成为好友！','ok'); }else{ toast('好友申请已发出，等对方登录后在「申请」里同意','ok'); }
         renderFriends();               // 由 renderFriends 统一重绘，并自动恢复搜索结果
       });
     });
@@ -1120,14 +1501,17 @@ function renderFriends(){
     b.addEventListener('click',function(){
       var id=b.getAttribute('data-accept')||b.getAttribute('data-reject');
       var r=Social.respond(id, me, !!b.getAttribute('data-accept'));
-      if(!r.ok){ alert(r.error); return; }
+      if(!r.ok){ toast(r.error,'err'); return; }
       renderFriends();
     });
   });
   box.querySelectorAll('[data-unfriend]').forEach(function(b){
     b.addEventListener('click',function(){
-      if(!confirm('确定删除这个好友吗？（会同时清除相关申请）')) return;
-      Social.remove(me, b.getAttribute('data-unfriend')); renderFriends();
+      confirmBox('确定删除这个好友吗？（会同时清除相关申请）', function(){
+        Social.remove(me, b.getAttribute('data-unfriend'));
+        toast('已删除该好友','ok');
+        renderFriends();
+      });
     });
   });
   box.querySelectorAll('[data-chat]').forEach(function(b){
@@ -1202,7 +1586,7 @@ function toggleRecord(){
   $('btnVoice').disabled=true;
   VOICE.start().then(function(){
     VOICE.active=true; // start 内已置位，保险
-    $('btnVoice').disabled=false; $('btnVoice').classList.add('on'); $('btnVoice').textContent='⏹ 停止';
+    $('btnVoice').disabled=false; $('btnVoice').classList.add('on'); $('voiceLabel').textContent='停止';
     $('recHint').style.display='inline'; $('recHint').textContent='录音中 0s · 再点停止发送';
     $('tip').textContent='正在录音（麦克风）…';
     var s=0;
@@ -1214,20 +1598,22 @@ function toggleRecord(){
   }).catch(function(e){
     $('btnVoice').disabled=false; stopRecUI();
     // 预览面板 / 无权限时降级：让用户选择本地音频文件当语音发，保证任何环境都能演示
-    var msg='当前环境无法录音（麦克风被禁用或不支持）';
-    if(confirm('无法使用麦克风录音。\n\n是否改为「选择一个音频文件」作为语音消息发送？\n（预览面板常禁用麦克风，用这个方式也能完整演示语音功能）')){
-      $('fileAudio').click();
-      msg='已打开文件选择框：选一个 mp3/wav 即可作为语音消息发出';
-    }else{
-      msg='已取消。也可点「📎 文件」上传音频，或发布到正式域名后使用麦克风';
-    }
-    $('tip').textContent=msg;
+    var fallback='当前环境无法录音（麦克风被禁用或不支持）';
+    $('tip').textContent=fallback;
+    confirmBox('无法使用麦克风录音。\n\n是否改为「选择一个音频文件」作为语音消息发送？\n（预览面板常禁用麦克风，用这个方式也能完整演示语音功能）',
+      function(){
+        $('fileAudio').click();
+        $('tip').textContent='已打开文件选择框：选一个 mp3/wav 即可作为语音消息发出';
+      },
+      function(){
+        $('tip').textContent='已取消。可点「文件」上传音频，或发布到正式域名后使用麦克风';
+      });
   });
 }
 function stopRecUI(){
   VOICE.active=false;
   if(VOICE.timer){ clearInterval(VOICE.timer); VOICE.timer=null; }
-  $('btnVoice').classList.remove('on'); $('btnVoice').textContent='🎤 语音';
+  $('btnVoice').classList.remove('on'); $('voiceLabel').textContent='语音';
   $('recHint').style.display='none'; $('tip').textContent='';
 }
 
@@ -1291,7 +1677,10 @@ function doSend(){
   var dm = isDm && state.pmPeer ? {to:state.pmPeer.uid,toName:state.pmPeer.nickname} : null;
   $('btnSend').disabled=true;
   Promise.resolve(send(text,'user',null,{dm:dm})).then(function(ok){
-      if(ok!==false){ el.value=''; el.style.height='auto'; }
+      if(ok!==false){
+        el.value=''; el.style.height='auto';
+        var sb=$('btnSend'); sb.classList.remove('sent'); void sb.offsetWidth; sb.classList.add('sent');
+      }
     })
     .catch(function(e){ $('tip').textContent='发送失败：'+(e&&e.message?e.message:'未知错误'); })
     .then(function(){ $('btnSend').disabled=false; el.focus(); });
@@ -1325,6 +1714,7 @@ function askAI(preset){
   if(state.asking) return;
   var question = cleanMention(raw) || raw; // 去掉触发词；若只剩触发词则原样问
   state.asking=true; $('tip').textContent='小星思考中…（首次调用约需 3~10 秒）'; $('btnSend').disabled=true;
+  refresh();   // 立即显示「正在输入」气泡
   var uidAI = state.me ? state.me.id : 'guest';
   // 先抓历史（此时当前问题还没入库），再发问题、带着历史调 AI
   buildHistory(uidAI, null)
@@ -1364,12 +1754,14 @@ function switchScope(scope){
   };
   $('chatTitle').textContent = titles[scope]||'群聊大厅';
   $('chatDesc').textContent = descs[scope]||'';
+  var mb=$('msgs'); mb.classList.remove('swap'); void mb.offsetWidth; mb.classList.add('swap');
+  LAST_SCOPE=null;   // 切换视图后回到最新消息
   refresh();
 }
 
 /* 进入与某好友的私聊 */
 function openPm(peer){
-  if(!Social.isFriend(state.me.uid, peer.uid)){ alert('对方还不是你的好友，请先加好友'); return; }
+  if(!Social.isFriend(state.me.uid, peer.uid)){ toast('对方还不是你的好友，请先加好友','err'); return; }
   state.pmPeer=peer; state.frTab='friends';
   switchScope('dm');
 }
@@ -1404,6 +1796,13 @@ function loadCloudSDK(cb){
 
 /* 启动 */
 document.addEventListener('DOMContentLoaded',function(){
+  initTheme();
+  $('btnTheme').addEventListener('click',toggleTheme);
+  $('btnThemeEntry').addEventListener('click',toggleTheme);
+  $('modalOk').addEventListener('click',function(){ closeModal(true); });
+  $('modalCancel').addEventListener('click',function(){ closeModal(false); });
+  $('modal').addEventListener('click',function(e){ if(e.target===this) closeModal(false); });
+  document.addEventListener('pointerdown',rippleDelegate);
   function bootstrap(){
     Store.init().then(function(){
       setModeUI();
@@ -1474,7 +1873,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(this.files && this.files[0]) doSendAudioFile(this.files[0]);
   });
   $('lightbox').addEventListener('click',function(){
-    this.style.display='none'; $('lightboxImg').src='';
+    this.style.display='none'; this.classList.remove('show'); $('lightboxImg').src='';
   });
   $('navAi').addEventListener('click',function(){
     // 点按钮 = 自动给当前输入加上 @小星 并发送，与手打 @小星 走同一条逻辑
