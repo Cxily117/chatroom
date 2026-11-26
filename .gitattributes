@@ -1,0 +1,4 @@
+# Dockerfile 在 Linux 容器里构建，必须是 LF 换行，
+# CRLF 会让 RUN 指令末尾多出 \r 而报错。
+Dockerfile text eol=lf
+server/Dockerfile text eol=lf
