@@ -772,8 +772,9 @@ html[data-bubble] .msg.mine .bubble.sticker-bub{background:transparent;border:no
 .fx-z{color:#9fb3d1;font-size:14px}
 .fx-bang{color:#ff6b8a;font-size:18px}
 .fx-conf{width:7px;height:10px;border-radius:2px}
+.ai-pet[data-pose="wave"] .fx-star{font-size:19px;color:#ffd45e;text-shadow:0 0 12px rgba(255,190,40,.9),0 0 4px #fff8d8}
 .ai-pet[data-pose="heart"] .pet-art{animation:petHeart 2.4s ease-in-out infinite}
-.ai-pet[data-pose="wave"] .pet-art{animation:petWaveHello 1.8s ease-in-out infinite}
+.ai-pet[data-pose="wave"] .pet-art{animation:petWaveHello 1.2s ease-in-out infinite}
 .ai-pet[data-pose="think"] .pet-art{animation:petThink 2.3s ease-in-out infinite}
 .ai-pet[data-pose="happy"] .pet-art{animation:petHappy .95s ease-in-out infinite}
 .ai-pet[data-pose="shy"] .pet-art{animation:petShy 1.7s ease-in-out infinite}
@@ -791,7 +792,7 @@ html[data-bubble] .msg.mine .bubble.sticker-bub{background:transparent;border:no
 .ai-pet[data-pose="sleep"] .fx{animation:fxZzz 3s ease-out infinite}
 .ai-pet[data-pose="surprise"] .fx{animation:fxPop 1.4s ease-out infinite}
 @keyframes petHeart{0%,100%{transform:translateY(0) scale(1)}20%{transform:translateY(-2px) scale(1.035)}40%{transform:translateY(0) scale(1)}60%{transform:translateY(-2px) scale(1.025)}}
-@keyframes petWaveHello{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-5px) rotate(-3deg)}70%{transform:translateY(-3px) rotate(3deg)}}
+@keyframes petWaveHello{0%,100%{transform:rotate(0) translateY(0)}25%{transform:rotate(-9deg) translateY(-4px)}50%{transform:rotate(0) translateY(-2px)}75%{transform:rotate(9deg) translateY(-4px)}}
 @keyframes petThink{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(-3deg) translateY(-5px)}}
 @keyframes petHappy{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-15px) scale(1.06)}70%{transform:translateY(0) scale(.98)}}
 @keyframes petShy{0%,100%{transform:rotate(5deg) scale(.96)}50%{transform:rotate(1deg) scale(.98)}}
@@ -799,7 +800,7 @@ html[data-bubble] .msg.mine .bubble.sticker-bub{background:transparent;border:no
 @keyframes petSleep{0%,100%{transform:translateY(0) scale(.985)}50%{transform:translateY(-3px) scale(1)}}
 @keyframes petSurprise{0%,100%{transform:scale(1)}25%{transform:scale(1.08) translateY(-5px)}55%{transform:scale(.98)}}
 @keyframes fxFloatUp{0%{opacity:0;transform:translateY(8px) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translateY(-38px) scale(1.1)}}
-@keyframes fxOrbit{0%{opacity:0;transform:translate(0,0) scale(.6)}25%{opacity:1}75%{opacity:1}100%{opacity:0;transform:translate(16px,-26px) scale(1)}}
+@keyframes fxOrbit{0%{opacity:0;transform:translate(0,0) scale(.5) rotate(0)}25%{opacity:1;transform:translate(10px,-10px) scale(1.25) rotate(45deg)}65%{opacity:1;transform:translate(18px,-26px) scale(1.05) rotate(110deg)}100%{opacity:0;transform:translate(22px,-34px) scale(.55) rotate(160deg)}}
 @keyframes fxPop{0%,100%{opacity:0;transform:scale(.5)}35%{opacity:1;transform:scale(1.15)}70%{opacity:.9;transform:scale(1)}}
 @keyframes fxConfetti{0%{opacity:0;transform:translateY(6px) rotate(0)}20%{opacity:1}100%{opacity:0;transform:translateY(-34px) rotate(220deg)}}
 @keyframes fxZzz{0%{opacity:0;transform:translate(0,6px) scale(.7)}30%{opacity:.95}100%{opacity:0;transform:translate(12px,-30px) scale(1.1)}}
@@ -1796,9 +1797,11 @@ var PET_ACTS=[
 var PET_FX={
   heart:['<i class="fx fx-heart" style="left:16%;top:34%;animation-delay:0s">♥</i>',
          '<i class="fx fx-heart" style="left:70%;top:26%;animation-delay:.7s">♥</i>'],
-  wave:['<i class="fx fx-star" style="left:-4%;top:28%;animation-delay:0s">✦</i>',
-        '<i class="fx fx-star" style="left:82%;top:20%;animation-delay:.35s">✦</i>',
-        '<i class="fx fx-star" style="left:88%;top:58%;animation-delay:.7s">✦</i>'],
+  wave:['<i class="fx fx-star" style="left:-6%;top:24%;animation-delay:0s">✦</i>',
+        '<i class="fx fx-star" style="left:80%;top:14%;animation-delay:.25s">✦</i>',
+        '<i class="fx fx-star" style="left:88%;top:52%;animation-delay:.5s">✦</i>',
+        '<i class="fx fx-star" style="left:8%;top:62%;animation-delay:.75s">✦</i>',
+        '<i class="fx fx-star" style="left:46%;top:-8%;animation-delay:1s">✦</i>'],
   think:['<i class="fx fx-q" style="left:42%;top:-8%;animation-delay:0s">?</i>',
          '<i class="fx fx-star" style="left:76%;top:10%;animation-delay:.5s">✦</i>'],
   happy:['<i class="fx fx-conf" style="left:10%;top:22%;background:#ff8fb1;animation-delay:0s"></i>',
