@@ -66,7 +66,7 @@ button,input,textarea{font-family:inherit}
 .btn-quiet{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;
   color:var(--muted);cursor:pointer;font-size:13px;transition:.15s}
 .btn-quiet:hover{color:var(--danger);border-color:var(--danger)}
-.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
 .head{height:72px;flex-shrink:0;background:var(--card);border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;padding:0 28px}
 .title{font-size:17px;font-weight:750}
@@ -542,6 +542,191 @@ html[data-theme="dark"][data-bubble="neon"] .msg.mine .bubble{
   box-shadow:0 8px 24px rgba(124,108,255,.38),inset 0 0 0 1px rgba(255,255,255,.18)}
 html[data-theme="dark"][data-bubble="note"] .msg.mine .bubble{
   background:#3a3320;color:#f5ead0;border-color:#6b5c33}
+/* ==================== 萌系装扮气泡（照着装扮商城做的卡通造型气泡） ====================
+   用 html[data-bubble^="cute-"] 统一命中，颜色由每套皮肤自己定义 CSS 变量；
+   猫耳 / 兔耳 / 蝴蝶结 / 尾巴 / 翅膀 / 邮票 / 底座由 render() 注入的 .bd 装饰元素绘制。 */
+html[data-bubble="cute-cat"]{--bub-other:#fff8fb;--bub-mine:#ffe9f3;--bub-frame:#ffc9de;--bub-text:#5b4652}
+html[data-bubble="cute-bunny"]{--bub-other:#fff7fb;--bub-mine:#ffe6f2;--bub-frame:#f7b6d3;--bub-text:#5b3f51}
+html[data-bubble="cute-chick"]{--bub-other:#fffbe6;--bub-mine:#fff2b8;--bub-frame:#f2cf62;--bub-text:#5c4a22}
+html[data-bubble="cute-duck"]{--bub-other:#fff7e6;--bub-mine:#ffe9c2;--bub-frame:#f5b95c;--bub-text:#5c4526}
+html[data-bubble="cute-envelope"]{--bub-other:#fffafa;--bub-mine:#fff0f0;--bub-frame:#eaa0a0;--bub-text:#5c3b3b}
+html[data-bubble="cute-monitor"]{--bub-other:#f7f8ff;--bub-mine:#e9ecff;--bub-frame:#8b95b8;--bub-text:#333c5c}
+html[data-bubble="cute-angel"]{--bub-other:#f4fbff;--bub-mine:#e4f3ff;--bub-frame:#a9d3ec;--bub-text:#33556b}
+html[data-bubble="cute-ribbon"]{--bub-other:#fff7fb;--bub-mine:#ffe4f0;--bub-frame:#f4b6cf;--bub-text:#5c3f51}
+html[data-theme="dark"][data-bubble^="cute-"]{--bub-other:#262936;--bub-mine:#332f45;--bub-frame:#5a5573;--bub-text:#ecebf5}
+/* 萌系装扮给聊天区加一层很淡的柔光，呼应参考图里那种梦幻背景 */
+html[data-bubble^="cute-"] .msgs{
+  background:radial-gradient(circle at 15% 25%,rgba(255,190,220,.16) 0,transparent 23%),
+             radial-gradient(circle at 82% 66%,rgba(170,215,245,.14) 0,transparent 25%),
+             radial-gradient(circle at 55% 92%,rgba(255,225,160,.13) 0,transparent 21%),var(--bg)}
+html[data-bubble^="cute-"] .msg .bubble{background:var(--bub-other);color:var(--bub-text);
+  border:2px solid var(--bub-frame);border-radius:20px;padding:12px 16px;
+  box-shadow:0 4px 14px rgba(31,35,51,.07)}
+html[data-bubble^="cute-"] .msg.mine .bubble{background:var(--bub-mine);color:var(--bub-text);border-color:var(--bub-frame)}
+html[data-bubble^="cute-"] .msg.ai .bubble{background:var(--bub-other);color:var(--bub-text)}
+html[data-bubble^="cute-"] .msg.tight .bubble,
+html[data-bubble^="cute-"] .msg.mine.tight .bubble{border-radius:20px}
+html[data-bubble^="cute-"] .bubble:not(.hasimg):not(.hasatt)::after{display:none}
+/* 萌系皮肤下「自己发的」是浅底深字，附件卡片同步改回浅色，避免白字看不见 */
+html[data-bubble^="cute-"] .msg.mine .file-card{background:var(--card);border-color:var(--border);color:var(--text)}
+html[data-bubble^="cute-"] .msg.mine .file-ico{background:var(--soft);color:var(--primary)}
+html[data-bubble^="cute-"] .msg.mine .file-dl{background:var(--primary);color:#fff}
+html[data-bubble^="cute-"] .msg.mine .voice-play{background:var(--soft);color:var(--primary)}
+html[data-bubble^="cute-"] .msg.mine .voice-bars i{background:var(--primary)}
+html[data-bubble^="cute-"] .msg.mine .bubble .img-cap{color:var(--bub-text)}
+/* 装饰元素 */
+.bd{position:absolute;pointer-events:none;z-index:3;line-height:1;font-size:12px;color:#ffb84d}
+.bd-ear-l,.bd-ear-r{top:-10px;width:0;height:0;border-left:9px solid transparent;
+  border-right:9px solid transparent;border-bottom:14px solid var(--bub-frame)}
+.bd-ear-l{left:16px;transform:rotate(-16deg)}
+.bd-ear-r{right:16px;transform:rotate(16deg)}
+html[data-bubble="cute-bunny"] .bd-ear-l,html[data-bubble="cute-bunny"] .bd-ear-r{
+  top:-19px;border-left-width:7px;border-right-width:7px;border-bottom-width:25px;border-radius:5px}
+html[data-bubble="cute-duck"] .bd-ear-l,html[data-bubble="cute-duck"] .bd-ear-r{border-bottom-width:10px;top:-7px}
+.bd-tail{right:-15px;bottom:5px;width:16px;height:22px;border:3px solid var(--bub-frame);
+  border-left:none;border-radius:0 70% 70% 0;transform:rotate(-14deg)}
+.bd-bow,.bd-ribbon{width:22px;height:14px;
+  background:radial-gradient(ellipse at 27% 50%,#ff92c0 0 47%,transparent 48%),
+             radial-gradient(ellipse at 73% 50%,#ff92c0 0 47%,transparent 48%)}
+.bd-bow{right:-9px;top:-10px}
+.bd-ribbon{left:-9px;top:-10px;width:26px;height:16px}
+.bd-bow:after,.bd-ribbon:after{content:"";position:absolute;left:9px;top:3px;width:5px;height:8px;
+  border-radius:3px;background:#ff6fa8}
+.bd-blush-l,.bd-blush-r{top:42%;width:9px;height:5px;border-radius:50%;background:rgba(255,140,175,.55)}
+.bd-blush-l{left:5px}.bd-blush-r{right:5px}
+.bd-beak{left:-9px;top:42%;width:0;height:0;border-top:6px solid transparent;
+  border-bottom:6px solid transparent;border-left:11px solid #f5a623}
+.bd-spark{right:-13px;top:-8px;font-size:14px;color:#ffc14d}
+.bd-spark2{left:-13px;bottom:-8px;font-size:11px;color:#9ed4f5}
+.bd-stamp{right:-8px;top:-9px;width:17px;height:19px;border:2px dashed #e08b8b;
+  border-radius:3px;background:#fff6f6}
+.bd-seal{right:-9px;bottom:-8px;width:13px;height:13px;border-radius:50%;background:#f28b8b;
+  border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.bd-stand{bottom:-11px;left:50%;transform:translateX(-50%);width:40px;height:7px;
+  border-radius:0 0 7px 7px;background:var(--bub-frame)}
+.bd-dot{right:9px;bottom:8px;width:6px;height:6px;border-radius:50%;background:#7fd6a2}
+.bd-wing-l,.bd-wing-r{top:2px;width:19px;height:26px;border:2px solid var(--bub-frame);
+  background:rgba(255,255,255,.75)}
+.bd-wing-l{left:-16px;border-radius:70% 12% 70% 12%;transform:rotate(-18deg)}
+.bd-wing-r{right:-16px;border-radius:12% 70% 12% 70%;transform:rotate(18deg)}
+html[data-bubble="cute-chick"] .bubble,html[data-bubble="cute-duck"] .bubble{border-radius:28px 28px 26px 26px}
+html[data-bubble="cute-envelope"] .msg .bubble{border-style:dashed;border-radius:8px}
+html[data-bubble="cute-monitor"] .msg .bubble{border-radius:10px;box-shadow:inset 0 0 0 2px rgba(139,149,184,.18)}
+/* ==================== 装扮面板：改成商城式缩略图网格 ==================== */
+.bubble-pop{width:min(452px,calc(100vw - 28px));padding:14px}
+.bp-head{font-size:13px;padding:2px 4px 12px}
+.bp-list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:340px;overflow-y:auto;padding:2px}
+.bp-sec{grid-column:1/-1;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;
+  padding:8px 4px 3px;border-bottom:1px dashed var(--border);margin-top:2px}
+.bp-item{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:6px;
+  padding:9px;background:var(--surface);border:1px solid var(--border);border-radius:11px}
+.bp-item:hover{border-color:var(--primary);background:var(--hover)}
+.bp-item.on{background:var(--soft);border-color:var(--primary)}
+.bp-preview{width:100%;height:40px;border-radius:8px}
+.bp-text{gap:1px}
+.bp-name{font-size:12px}
+.bp-desc{font-size:10px;white-space:nowrap}
+.bp-check{position:absolute;top:6px;right:6px;margin-left:0;opacity:0;
+  background:var(--primary);color:#fff;border-radius:50%;padding:2px;width:17px;height:17px}
+.bp-item.on .bp-check{opacity:1}
+/* 萌系缩略图：统一猫耳造型 + 每套自己的描边色 */
+.bp-preview.bp-cute{background:var(--card)}
+.bp-preview.bp-cute i,.bp-preview.bp-cute b{background:#fff;border:2px solid var(--bp-frame,#ffc9de);border-radius:10px}
+.bp-preview.bp-cute:before,.bp-preview.bp-cute:after{content:"";position:absolute;top:5px;width:0;height:0;
+  border-left:6px solid transparent;border-right:6px solid transparent;
+  border-bottom:10px solid var(--bp-frame,#ffc9de);z-index:2}
+.bp-preview.bp-cute:before{left:8px}
+.bp-preview.bp-cute:after{left:24px}
+/* ==================== 表情包面板 / 表情消息 ==================== */
+.sticker-wrap{position:relative;display:inline-flex}
+.sticker-pop{position:absolute;bottom:calc(100% + 12px);left:0;width:318px;
+  max-width:calc(100vw - 28px);z-index:70;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-md);box-shadow:var(--shadow-md);padding:12px;animation:zoomIn .2s var(--ease)}
+.sp-head{display:flex;align-items:center;justify-content:space-between;font-size:13px;
+  font-weight:700;color:var(--text);margin-bottom:10px}
+.sp-x{width:24px;height:24px;border:none;border-radius:6px;background:var(--surface);
+  color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sp-x .ic{width:14px;height:14px}
+.sp-x:hover{color:var(--danger)}
+.sp-tabs{display:flex;gap:6px;margin-bottom:10px}
+.sp-tab{padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);
+  color:var(--muted);font-size:12px;font-weight:650;cursor:pointer}
+.sp-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.sp-body{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;max-height:180px;overflow-y:auto}
+.sp-body.pack{grid-template-columns:repeat(4,1fr);gap:7px;max-height:210px}
+.sp-emoji{border:none;background:transparent;font-size:21px;line-height:1.3;padding:4px 0;
+  border-radius:7px;cursor:pointer;transition:.12s}
+.sp-emoji:hover{background:var(--hover);transform:scale(1.18)}
+.sp-sticker{border:1px solid var(--border);border-radius:11px;background:var(--surface);padding:5px 3px;
+  cursor:pointer;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.sp-sticker:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.sp-sticker svg{width:100%;height:56px}
+.sp-sticker span{font-size:10px;color:var(--muted);white-space:nowrap}
+.sp-foot{font-size:10px;color:var(--muted);border-top:1px solid var(--border);
+  margin-top:9px;padding-top:8px;line-height:1.6}
+.msg .bubble.sticker-bub{background:transparent;border:none;box-shadow:none;padding:6px}
+/* 表情包要「贴纸直接露出来」，压过所有气泡皮肤的边框规则 */
+html[data-bubble] .msg .bubble.sticker-bub,
+html[data-bubble] .msg.mine .bubble.sticker-bub{background:transparent;border:none;box-shadow:none;padding:6px}
+.sticker-box{width:104px;text-align:center}
+.sticker-svg{width:100%;height:104px;display:block}
+.sticker-cap{font-size:11px;color:var(--muted);margin-top:2px}
+/* ==================== 悬浮智能体「小星」 ==================== */
+.ai-pet{position:absolute;right:22px;bottom:132px;z-index:45;width:118px;
+  display:flex;flex-direction:column;align-items:center;cursor:grab;user-select:none;touch-action:none;
+  filter:drop-shadow(0 8px 16px rgba(31,35,51,.16))}
+.ai-pet:active{cursor:grabbing}
+.ai-pet:before{content:"";position:absolute;top:6px;left:8px;right:8px;height:104px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,226,155,.42) 0,transparent 70%);
+  filter:blur(7px);z-index:-1;pointer-events:none}
+.pet-art{width:100px;height:110px;animation:petFloat 3.2s ease-in-out infinite}
+.pet-svg{width:100%;height:100%;overflow:visible}
+.pet-x{position:absolute;top:-6px;right:-2px;width:22px;height:22px;border-radius:50%;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;z-index:3;opacity:0;transition:.15s}
+.pet-x .ic{width:12px;height:12px}
+.ai-pet:hover .pet-x{opacity:1}
+.pet-say{position:absolute;right:96%;top:8px;width:168px;padding:9px 11px;
+  border-radius:12px 12px 4px 12px;background:var(--card);border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);font-size:12px;line-height:1.6;color:var(--text);z-index:4}
+.pet-say.show{animation:zoomIn .22s var(--ease)}
+.pet-tag{margin-top:-6px;padding:4px 12px;border-radius:14px;background:var(--card);
+  border:1px solid var(--border);box-shadow:var(--shadow-xs);font-size:11px;
+  font-weight:700;color:var(--primary);white-space:nowrap}
+.pet-ask{margin-top:6px;border:none;border-radius:14px;padding:5px 12px;
+  background:linear-gradient(135deg,#7c6cff,#5a49f0);color:#fff;font-size:11px;
+  font-weight:650;cursor:pointer;box-shadow:0 5px 14px rgba(109,94,252,.35)}
+.pet-restore{position:absolute;right:18px;bottom:18px;z-index:45;border:none;border-radius:18px;
+  padding:8px 14px;background:linear-gradient(135deg,#7c6cff,#5a49f0);color:#fff;
+  font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(109,94,252,.4)}
+@keyframes petFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(1.5deg)}}
+@keyframes wingFlap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.82)}}
+.pet-eyes-happy,.pet-eyes-sleep,.pet-m2,.pet-m3{display:none}
+.pet-fx{opacity:.6}
+.ai-pet[data-pose="happy"] .pet-eyes-open,.ai-pet[data-pose="shy"] .pet-eyes-open{display:none}
+.ai-pet[data-pose="happy"] .pet-eyes-happy,.ai-pet[data-pose="shy"] .pet-eyes-happy{display:block}
+.ai-pet[data-pose="happy"] .pet-m1{display:none}
+.ai-pet[data-pose="happy"] .pet-m3{display:block}
+.ai-pet[data-pose="think"] .pet-m1{display:none}
+.ai-pet[data-pose="think"] .pet-m2{display:block}
+.ai-pet[data-pose="think"] .pet-art{animation:none;transform:rotate(-7deg)}
+.ai-pet[data-pose="shy"] .pet-art{animation:none;transform:rotate(6deg) scale(.96)}
+.ai-pet[data-pose="shy"] .pet-blush{opacity:1}
+.ai-pet[data-pose="teach"] .pet-art{animation-duration:2.2s}
+.ai-pet[data-pose="teach"] .pet-fx{opacity:1}
+.ai-pet[data-pose="wave"] .pet-wings{animation:wingFlap 1.4s ease-in-out infinite}
+@media(max-width:720px){
+  .ai-pet{right:8px;bottom:118px;width:96px}
+  .pet-art{width:80px;height:88px}
+  .pet-say{width:132px;right:92%}
+  .bubble-pop{width:min(340px,calc(100vw - 28px))}
+  .bp-list{grid-template-columns:repeat(2,1fr);max-height:300px}
+  .sticker-pop{width:290px}
+  .sp-body{grid-template-columns:repeat(7,1fr)}
+}
+@media (prefers-reduced-motion: reduce){
+  .pet-art,.ai-pet[data-pose="wave"] .pet-wings{animation:none}
+}
 </style>
 <script>
 /* 如需接云端：把下面 env 改成你的腾讯云环境 ID；留空 = 本地存储模式（也能完整体验） */
@@ -567,7 +752,7 @@ window.CHAT_CONFIG = {
   // 气泡样式同样在绘制前定好，避免刷新时先闪一下默认样式
   try{
     var b=window.localStorage.getItem('spark_chat_bubble_v1');
-    if(/^(classic|flat|glass|neon|note)$/.test(b||'')) document.documentElement.setAttribute('data-bubble',b);
+    if(/^(classic|flat|glass|neon|note|cute-[a-z]+)$/.test(b||'')) document.documentElement.setAttribute('data-bubble',b);
   }catch(e){}
 })();
 </script>
@@ -591,6 +776,8 @@ window.CHAT_CONFIG = {
   <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.8.3-1.3.9-1.3 1.8v.4"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
   <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.4a1.9 1.9 0 0 0 1.5-3.1 1.9 1.9 0 0 1 1.5-3.1H19a2 2 0 0 0 2-2.1A9 9 0 0 0 12 3z"/><circle cx="7.6" cy="11.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.2" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="17.3" cy="10.4" r="1.1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M8.2 14.2a4.6 4.6 0 0 0 7.6 0"/><circle cx="9" cy="9.6" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="9.6" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
 </svg>
 
 <!-- ==================== 登录 / 注册界面 ==================== -->
@@ -669,9 +856,9 @@ window.CHAT_CONFIG = {
           <svg class="ic"><use href="#i-palette"></use></svg>
         </button>
         <div class="bubble-pop" id="bubblePop" style="display:none" role="menu">
-          <div class="bp-head">气泡样式 <span id="bpCurrent">经典圆润</span></div>
+          <div class="bp-head"><span>✦ 个性装扮 · 气泡</span><span id="bpCurrent">经典圆润</span></div>
           <div class="bp-list" id="bpList"></div>
-          <div class="bp-foot">只影响本机显示 · 刷新后自动保留<br>点一下即可实时预览并切换</div>
+          <div class="bp-foot">13 套装扮随便换 · 只影响本机显示，刷新后自动保留</div>
         </div>
       </div>
       <button class="theme-btn" id="btnTheme" title="切换亮 / 暗主题" aria-label="切换主题">
@@ -685,6 +872,19 @@ window.CHAT_CONFIG = {
         <button class="imgbtn" id="btnImg" title="发送图片（自动压缩）"><svg class="ic"><use href="#i-image"></use></svg><span>图片</span></button>
         <button class="imgbtn" id="btnFile" title="上传任意文件（本地演示建议小于 500KB）"><svg class="ic"><use href="#i-file"></use></svg><span>文件</span></button>
         <button class="imgbtn" id="btnVoice" title="录音发语音；不支持时可选择音频文件"><svg class="ic"><use href="#i-mic"></use></svg><span id="voiceLabel">语音</span></button>
+        <div class="sticker-wrap">
+          <button class="imgbtn" id="btnSticker" title="发送表情包 / emoji"><svg class="ic"><use href="#i-smile"></use></svg><span>表情</span></button>
+          <div class="sticker-pop" id="stickerPop" style="display:none">
+            <div class="sp-head"><span>表情包</span><button class="sp-x" id="spClose" title="关闭"><svg class="ic"><use href="#i-x"></use></svg></button></div>
+            <div class="sp-tabs">
+              <button class="sp-tab active" data-sptab="emoji">Emoji</button>
+              <button class="sp-tab" data-sptab="pack">萌宠表情包</button>
+            </div>
+            <div class="sp-body" id="spEmoji"></div>
+            <div class="sp-body pack" id="spPack" style="display:none"></div>
+            <div class="sp-foot">Emoji 点一下插入输入框 · 表情包点一下直接发送</div>
+          </div>
+        </div>
         <span class="rec-hint" id="recHint" style="display:none">录音中 0s · 再点停止发送</span>
       </div>
       <div class="crow">
@@ -695,6 +895,52 @@ window.CHAT_CONFIG = {
       <input type="file" id="fileAny" style="display:none">
       <input type="file" id="fileAudio" accept="audio/*" style="display:none">
     </div>
+
+    <!-- 悬浮智能体「小星」：可拖动，点一下切换不同的标签动作 -->
+    <div class="ai-pet" id="aiPet" data-act="0" data-pose="wave" title="点一下换个动作 · 按住可拖动">
+      <button class="pet-x" id="petHide" title="收起小星"><svg class="ic"><use href="#i-x"></use></svg></button>
+      <div class="pet-say" id="petSay" style="display:none"></div>
+      <div class="pet-art">
+        <svg class="pet-svg" viewBox="0 0 120 132" aria-hidden="true">
+          <defs>
+            <linearGradient id="petHair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe7a8"/><stop offset="1" stop-color="#f5b64b"/></linearGradient>
+            <linearGradient id="petDress" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7d6"/><stop offset="1" stop-color="#ffd16f"/></linearGradient>
+          </defs>
+          <g class="pet-wings">
+            <path d="M38 70 C12 52 4 78 22 90 C32 97 42 86 42 78Z" fill="#eef8ff" stroke="#bcdcf6" stroke-width="2"/>
+            <path d="M82 70 C108 52 116 78 98 90 C88 97 78 86 78 78Z" fill="#eef8ff" stroke="#bcdcf6" stroke-width="2"/>
+          </g>
+          <path d="M42 86 Q60 80 78 86 L86 116 Q60 126 34 116 Z" fill="url(#petDress)" stroke="#eec06a" stroke-width="2"/>
+          <circle cx="60" cy="52" r="30" fill="#fff4e6" stroke="#f3d8ac" stroke-width="2"/>
+          <path d="M30 50 Q28 18 60 16 Q92 18 90 50 Q84 34 60 34 Q36 34 30 50Z" fill="url(#petHair)" stroke="#e7a63c" stroke-width="2"/>
+          <g class="pet-crown">
+            <circle cx="44" cy="20" r="6" fill="#fff"/><circle cx="60" cy="13" r="7" fill="#fff"/><circle cx="76" cy="20" r="6" fill="#fff"/>
+            <circle cx="60" cy="13" r="3" fill="#ffd45e"/>
+          </g>
+          <g class="pet-eyes-open">
+            <ellipse cx="49" cy="54" rx="4" ry="5.2" fill="#5a4636"/><ellipse cx="71" cy="54" rx="4" ry="5.2" fill="#5a4636"/>
+            <circle cx="50" cy="52" r="1.4" fill="#fff"/><circle cx="72" cy="52" r="1.4" fill="#fff"/>
+          </g>
+          <g class="pet-eyes-happy">
+            <path d="M44 57 Q49 49 54 57" stroke="#5a4636" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <path d="M66 57 Q71 49 76 57" stroke="#5a4636" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          </g>
+          <g class="pet-eyes-sleep">
+            <path d="M44 55 Q49 60 54 55" stroke="#5a4636" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <path d="M66 55 Q71 60 76 55" stroke="#5a4636" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          </g>
+          <ellipse class="pet-blush" cx="39" cy="63" rx="6" ry="3.6" fill="#ffb3c6" opacity=".8"/>
+          <ellipse class="pet-blush" cx="81" cy="63" rx="6" ry="3.6" fill="#ffb3c6" opacity=".8"/>
+          <path class="pet-mouth pet-m1" d="M55 65 Q60 70 65 65" stroke="#cb7676" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <path class="pet-mouth pet-m2" d="M55 67 Q60 62 65 67" stroke="#cb7676" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle class="pet-mouth pet-m3" cx="60" cy="66" r="3.4" fill="#cb7676"/>
+          <g class="pet-fx"><text x="96" y="30" font-size="15">✦</text><text x="14" y="38" font-size="12">✧</text><text x="100" y="106" font-size="10">✧</text></g>
+        </svg>
+      </div>
+      <div class="pet-tag" id="petTag"># 打招呼</div>
+      <button class="pet-ask" id="petAsk">@ 问小星</button>
+    </div>
+    <button class="pet-restore" id="petRestore" style="display:none" title="唤回小星">✦ 小星</button>
   </main>
 </div>
 
@@ -1189,7 +1435,7 @@ var AI = {
     var s=String(q||'');
     if(/你好|hi|hello|在吗/i.test(s)) return '你好！我是小星 ✦ 星火聊天室的智能助手。输入消息就能群聊，问我问题我会尽力回答。';
     if(/你是谁|介绍|什么功能|能做什么/.test(s))
-      return '我是小星 ✦ 这个聊天室支持：账号注册登录（账号表单独存哈希密码）、群聊大厅、发图片/文件/语音、加好友与私聊、「个人」视图、owner_id 归属隔离、60 秒 8 条限流，还有亮/暗主题与 5 套气泡皮肤，以及我在线答疑。';
+      return '我是小星 ✦ 这个聊天室支持：账号注册登录（账号表单独存哈希密码）、群聊大厅、发图片/文件/语音/表情包、加好友与私聊、「个人」视图、owner_id 归属隔离、60 秒 8 条限流，还有亮/暗主题、13 套个性装扮气泡、悬浮的我（点一下换动作），以及在线答疑。';
     if(/文件|上传|附件|语音|录音|好友|私聊|加好友/.test(s))
       return '工具栏有「图片 / 文件 / 语音」三个按钮；侧栏「好友」可以搜索账号、发申请、同意后私聊。私聊消息带 toUid，群聊大厅严格过滤，不会串消息。';
     if(/架构|技术|前后端|什么语言|怎么实现/.test(s))
@@ -1289,20 +1535,43 @@ function toggleTheme(){
   toast(next==='dark'?'已切换到暗色主题':'已切换到亮色主题','ok');
 }
 
-/* ===== 气泡皮肤：5 套样式，用户自选并持久化 =====
-   只改 <html data-bubble="...">，样式全部由 CSS 变量/选择器驱动，
-   不影响消息数据，也不影响云端同步；离线/本地模式同样可用。 */
+/* ===== 气泡装扮：5 套经典 + 8 套萌系卡通造型，用户自选并持久化 =====
+   只改 <html data-bubble="...">：颜色/圆角/边框由 CSS 变量驱动，
+   猫耳 / 蝴蝶结 / 翅膀等装饰由 render() 注入 .bd 元素，纯展示、不写任何数据。 */
 var BUBBLE_KEY='spark_chat_bubble_v1';
+var BUBBLE_GROUPS=[{key:'classic',name:'经典皮肤'},{key:'cute',name:'萌系装扮 · 卡通造型'}];
 var BUBBLE_STYLES=[
-  {id:'classic',name:'经典圆润',desc:'默认 · 带小尾巴'},
-  {id:'flat',   name:'简约扁平',desc:'直角细边 · 干净利落'},
-  {id:'glass',  name:'玻璃拟态',desc:'半透明磨砂 · 柔光'},
-  {id:'neon',   name:'渐变霓虹',desc:'紫粉渐变 · 发光'},
-  {id:'note',   name:'手账便签',desc:'纸张质感 · 暖色'}
+  {id:'classic',   name:'经典圆润',   desc:'默认 · 带小尾巴',        group:'classic',pv:'classic'},
+  {id:'flat',       name:'简约扁平',   desc:'直角细边 · 干净利落',    group:'classic',pv:'flat'},
+  {id:'glass',      name:'玻璃拟态',   desc:'半透明磨砂 · 柔光',      group:'classic',pv:'glass'},
+  {id:'neon',       name:'渐变霓虹',   desc:'紫粉渐变 · 发光',        group:'classic',pv:'neon'},
+  {id:'note',       name:'手账便签',   desc:'纸张质感 · 暖色',        group:'classic',pv:'note'},
+  {id:'cute-cat',      name:'拟态小猫',   desc:'猫耳 · 蝴蝶结 · 尾巴', group:'cute',pv:'cute',frame:'#ffc9de',deco:['ear-l','ear-r','tail','bow','blush-l','blush-r']},
+  {id:'cute-bunny',    name:'粉白兔',     desc:'长耳朵 · 粉嫩腮红',     group:'cute',pv:'cute',frame:'#f7b6d3',deco:['ear-l','ear-r','blush-l','blush-r','spark']},
+  {id:'cute-chick',    name:'尖叫鸡',     desc:'圆滚滚 · 小尖嘴',       group:'cute',pv:'cute',frame:'#f2cf62',deco:['beak','blush-l','blush-r','spark']},
+  {id:'cute-duck',     name:'水豚噜噜',   desc:'橘黄 · 小揪揪',         group:'cute',pv:'cute',frame:'#f5b95c',deco:['ear-l','ear-r','bow','blush-l','blush-r']},
+  {id:'cute-envelope', name:'心室信封',   desc:'虚线边 · 小邮票',       group:'cute',pv:'cute',frame:'#eaa0a0',deco:['stamp','seal','spark']},
+  {id:'cute-monitor',  name:'电子显示器', desc:'屏幕框 · 小底座',       group:'cute',pv:'cute',frame:'#8b95b8',deco:['stand','dot']},
+  {id:'cute-angel',    name:'十字蓝天使', desc:'翅膀 · 星星',           group:'cute',pv:'cute',frame:'#a9d3ec',deco:['wing-l','wing-r','spark','spark2']},
+  {id:'cute-ribbon',   name:'丝带蜜语',   desc:'大蝴蝶结 · 柔粉',       group:'cute',pv:'cute',frame:'#f4b6cf',deco:['ribbon','blush-l','blush-r','spark']}
 ];
+var CUTE_DECO={};
+BUBBLE_STYLES.forEach(function(s){ if(s.group==='cute') CUTE_DECO[s.id]=s.deco; });
 function bubbleStyle(){
   var v=document.documentElement.getAttribute('data-bubble');
   return BUBBLE_STYLES.some(function(s){ return s.id===v; })?v:'classic';
+}
+function cuteDeco(){
+  var d=CUTE_DECO[bubbleStyle()];
+  if(!d) return '';
+  return d.map(function(x){
+    var txt=(x==='spark'||x==='spark2')?'✦':'';
+    return '<span class="bd bd-'+x+'">'+txt+'</span>';
+  }).join('');
+}
+/* 所有气泡统一走这个入口，保证萌系装饰对文字 / 图片 / 文件 / 语音 / 表情包都生效 */
+function bubbleHTML(content, cls){
+  return '<div class="bubble'+(cls?' '+cls:'')+'">'+cuteDeco()+content+'</div>';
 }
 function applyBubble(id){
   if(!BUBBLE_STYLES.some(function(s){ return s.id===id; })) id='classic';
@@ -1321,24 +1590,33 @@ function initBubble(){
   try{ t=SafeLS.getItem(BUBBLE_KEY); }catch(e){}
   applyBubble(t||'classic');
 }
+function bpCard(s){
+  var cute=s.group==='cute';
+  var st=cute?(' style="--bp-frame:'+s.frame+'"'):'';
+  return '<button class="bp-item" type="button" data-bp="'+s.id+'" role="menuitem">'
+    +'<span class="bp-preview bp-'+s.pv+(cute?' bp-cute':'')+'"'+st+'><i></i><b></b></span>'
+    +'<span class="bp-text"><span class="bp-name">'+esc(s.name)+'</span>'
+    +'<span class="bp-desc">'+esc(s.desc)+'</span></span>'
+    +'<svg class="ic bp-check"><use href="#i-check"></use></svg></button>';
+}
 function renderBubblePop(){
   var list=$('bpList'); if(!list) return;
   if(!list.childNodes.length){
-    list.innerHTML=BUBBLE_STYLES.map(function(s){
-      return '<button class="bp-item" type="button" data-bp="'+s.id+'" role="menuitem">'
-        +'<span class="bp-preview bp-'+s.id+'"><i></i><b></b></span>'
-        +'<span class="bp-text"><span class="bp-name">'+esc(s.name)+'</span>'
-        +'<span class="bp-desc">'+esc(s.desc)+'</span></span>'
-        +'<svg class="ic bp-check"><use href="#i-check"></use></svg></button>';
-    }).join('');
+    var html='';
+    BUBBLE_GROUPS.forEach(function(g){
+      html+='<div class="bp-sec">'+esc(g.name)+'</div>'
+        + BUBBLE_STYLES.filter(function(s){ return s.group===g.key; }).map(bpCard).join('');
+    });
+    list.innerHTML=html;
     list.querySelectorAll('.bp-item').forEach(function(b){
       b.addEventListener('click',function(){
         var id=b.getAttribute('data-bp');
         applyBubble(id);
         try{ SafeLS.setItem(BUBBLE_KEY,id); }catch(e){}
         closeBubblePop();
+        refresh();   // 卡通装饰由 render() 注入，切换后立刻重绘
         var s=BUBBLE_STYLES.filter(function(x){ return x.id===id; })[0];
-        toast('已切换气泡样式：'+(s?s.name:id),'ok');
+        toast('已换上「'+(s?s.name:id)+'」气泡','ok');
       });
     });
   }
@@ -1352,6 +1630,162 @@ function toggleBubblePop(force){
   if(open) renderBubblePop();
 }
 function closeBubblePop(){ toggleBubblePop(false); }
+
+/* ===== 表情包：内置 SVG 萌宠贴纸，只认白名单 id，杜绝任何注入 ===== */
+var EMOJIS=['😀','😂','🥹','😍','🥰','😎','🤔','😭','😡','😴','🤩','😇','👍','👏','🙏','💪',
+  '🎉','✨','❤️','💖','🔥','🌟','🌈','🌸','🍀','🍰','☕','🐱','🐶','🐰','🐻','🐼','🐸','🦄','🐥','🌙','⭐','💤','🎵','🍉','🎀'];
+var STICKERS=[
+  {id:'cat',   name:'猫猫探头', bg:'#ffece2',face:'#fffdf8',line:'#e7b9a3',ear:'tri',  eye:'dot',  cheek:'#ffb6c8',mouth:'w'},
+  {id:'bunny', name:'粉白兔',   bg:'#ffeaf3',face:'#fffafd',line:'#efb9d0',ear:'long', eye:'dot',  cheek:'#ff9fc0',mouth:'w'},
+  {id:'chick', name:'尖叫鸡',   bg:'#fff4cf',face:'#fff2a8',line:'#e6c45a',ear:'none', eye:'dot',  cheek:'#ffab7a',mouth:'w',beak:true},
+  {id:'bear',  name:'抱抱熊',   bg:'#f1e6dc',face:'#d9b493',line:'#b78f6d',ear:'round',eye:'dot',  cheek:'#e79a86',mouth:'w'},
+  {id:'panda', name:'熊猫呆呆', bg:'#e9f1ea',face:'#ffffff',line:'#9fb3a4',ear:'round',eye:'patch',cheek:'#f2a6b0',mouth:'w'},
+  {id:'frog',  name:'青蛙噗噗', bg:'#e4f6e0',face:'#a8df98',line:'#6fb763',ear:'bump', eye:'top',  cheek:'#f4b3a0',mouth:'w'},
+  {id:'star',  name:'小星本星', bg:'#eee9ff',face:'#fff3b0',line:'#b9a6ef',ear:'none', eye:'happy',cheek:'#ffb6d5',mouth:'w',star:true},
+  {id:'moon',  name:'晚安月',   bg:'#e8edff',face:'#fff6c9',line:'#9aa8e0',ear:'none', eye:'sleep',cheek:'#c9b6f5',mouth:'w',moon:true}
+];
+var STICKER_BY_ID={}; STICKERS.forEach(function(s){ STICKER_BY_ID[s.id]=s; });
+function stickerSVG(id){
+  var s=STICKER_BY_ID[id]; if(!s) return '';
+  var L=s.line, F=s.face, ear='';
+  if(s.ear==='tri') ear='<path d="M20 34 L16 9 L40 26Z" fill="'+F+'" stroke="'+L+'" stroke-width="2.5" stroke-linejoin="round"/>'
+    +'<path d="M80 34 L84 9 L60 26Z" fill="'+F+'" stroke="'+L+'" stroke-width="2.5" stroke-linejoin="round"/>';
+  else if(s.ear==='long') ear='<ellipse cx="27" cy="20" rx="9" ry="19" fill="'+F+'" stroke="'+L+'" stroke-width="2.5"/>'
+    +'<ellipse cx="73" cy="20" rx="9" ry="19" fill="'+F+'" stroke="'+L+'" stroke-width="2.5"/>';
+  else if(s.ear==='round') ear='<circle cx="23" cy="28" r="13" fill="'+F+'" stroke="'+L+'" stroke-width="2.5"/>'
+    +'<circle cx="77" cy="28" r="13" fill="'+F+'" stroke="'+L+'" stroke-width="2.5"/>';
+  else if(s.ear==='bump') ear='<circle cx="30" cy="27" r="11" fill="'+F+'" stroke="'+L+'" stroke-width="2.5"/>'
+    +'<circle cx="70" cy="27" r="11" fill="'+F+'" stroke="'+L+'" stroke-width="2.5"/>';
+  var E='#5a4636', eyes;
+  if(s.eye==='happy') eyes='<path d="M32 52 Q38 45 44 52" stroke="'+E+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+    +'<path d="M56 52 Q62 45 68 52" stroke="'+E+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+  else if(s.eye==='sleep') eyes='<path d="M32 52 Q38 58 44 52" stroke="'+E+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+    +'<path d="M56 52 Q62 58 68 52" stroke="'+E+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+  else if(s.eye==='top') eyes='<circle cx="30" cy="27" r="5.5" fill="#fff" stroke="'+L+'" stroke-width="2"/>'
+    +'<circle cx="70" cy="27" r="5.5" fill="#fff" stroke="'+L+'" stroke-width="2"/>'
+    +'<circle cx="30" cy="27" r="2.4" fill="'+E+'"/><circle cx="70" cy="27" r="2.4" fill="'+E+'"/>';
+  else if(s.eye==='patch') eyes='<ellipse cx="38" cy="50" rx="8" ry="9" fill="#4a4a55"/>'
+    +'<ellipse cx="62" cy="50" rx="8" ry="9" fill="#4a4a55"/>'
+    +'<circle cx="38" cy="50" r="3" fill="#fff"/><circle cx="62" cy="50" r="3" fill="#fff"/>';
+  else eyes='<ellipse cx="38" cy="50" rx="4" ry="5.2" fill="'+E+'"/>'
+    +'<ellipse cx="62" cy="50" rx="4" ry="5.2" fill="'+E+'"/>'
+    +'<circle cx="39.3" cy="48.4" r="1.4" fill="#fff"/><circle cx="63.3" cy="48.4" r="1.4" fill="#fff"/>';
+  var mouth=s.mouth==='o'?'<circle cx="50" cy="65" r="3.4" fill="#cb7676"/>'
+    :'<path d="M44 64 Q50 70 56 64" stroke="#cb7676" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  var extra='';
+  if(s.beak) extra='<path d="M44 60 L56 60 L50 68Z" fill="#f5a623" stroke="#dc9012" stroke-width="1.5"/>';
+  if(s.star) extra='<text x="76" y="24" font-size="15">✦</text>';
+  if(s.moon) extra='<text x="73" y="26" font-size="14">☾</text>';
+  return '<svg class="sticker-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+    +'<rect x="0" y="0" width="100" height="100" rx="22" fill="'+s.bg+'"/>'+ear
+    +'<ellipse cx="50" cy="58" rx="34" ry="31" fill="'+F+'" stroke="'+L+'" stroke-width="2.5"/>'
+    +'<ellipse cx="29" cy="62" rx="6.5" ry="3.6" fill="'+s.cheek+'" opacity=".75"/>'
+    +'<ellipse cx="71" cy="62" rx="6.5" ry="3.6" fill="'+s.cheek+'" opacity=".75"/>'
+    +eyes+mouth+extra+'</svg>';
+}
+function renderStickerPop(){
+  var e=$('spEmoji'), p=$('spPack');
+  if(e && !e.childNodes.length) e.innerHTML=EMOJIS.map(function(x){
+    return '<button class="sp-emoji" type="button" data-emoji="'+esc(x)+'">'+esc(x)+'</button>';
+  }).join('');
+  if(p && !p.childNodes.length) p.innerHTML=STICKERS.map(function(s){
+    return '<button class="sp-sticker" type="button" data-sticker="'+s.id+'" title="'+esc(s.name)+'">'
+      +stickerSVG(s.id)+'<span>'+esc(s.name)+'</span></button>';
+  }).join('');
+}
+function toggleStickerPop(force){
+  var p=$('stickerPop'); if(!p) return;
+  var open=(typeof force==='boolean')?force:(p.style.display==='none');
+  p.style.display=open?'block':'none';
+  if(open) renderStickerPop();
+}
+function closeStickerPop(){ toggleStickerPop(false); }
+function switchStickerTab(tab){
+  $('spEmoji').style.display=tab==='emoji'?'grid':'none';
+  $('spPack').style.display=tab==='pack'?'grid':'none';
+  document.querySelectorAll('[data-sptab]').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-sptab')===tab);
+  });
+}
+function insertEmoji(ch){
+  var el=$('input'), v=el.value, p=(el.selectionStart==null)?v.length:el.selectionStart;
+  el.value=v.slice(0,p)+ch+v.slice(p);
+  el.focus();
+  try{ el.setSelectionRange(p+ch.length,p+ch.length); }catch(e){}
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function sendSticker(id){
+  if(!state.me){ toast('请先登录','err'); return; }
+  if(state.scope!=='all' && state.scope!=='dm'){ toast('请切回「群聊大厅」或进入私聊再发表情包','err'); return; }
+  var s=STICKER_BY_ID[id]; if(!s) return;
+  closeStickerPop();
+  var dm=(state.scope==='dm'&&state.pmPeer)?{to:state.pmPeer.uid,toName:state.pmPeer.nickname}:null;
+  Promise.resolve(send('[表情包] '+s.name,'user',null,{sticker:id,dm:dm}))
+    .then(function(ok){ if(ok!==false) toast('表情包已发送：'+s.name,'ok'); })
+    .catch(function(e){ toast('发送失败：'+((e&&e.message)||'未知错误'),'err'); });
+}
+
+/* ===== 悬浮智能体「小星」：点一下换标签动作，按住可拖动 ===== */
+var PET_ACTS=[
+  {tag:'打招呼',say:'嗨～我是小星！点我再换个动作呀 ✦',pose:'wave'},
+  {tag:'思考中',say:'嗯……让我想想这个问题～',        pose:'think'},
+  {tag:'开心',  say:'今天也要开开心心的鸭！',          pose:'happy'},
+  {tag:'撒娇',  say:'夸夸我嘛，我会更聪明一点点～',    pose:'shy'},
+  {tag:'答疑',  say:'带 @小星 发消息，我就来接话啦',   pose:'teach'}
+];
+var petAct=0, petSayTimer=null;
+function cyclePet(){
+  petAct=(petAct+1)%PET_ACTS.length;
+  var a=PET_ACTS[petAct], pet=$('aiPet');
+  pet.setAttribute('data-act',petAct);
+  pet.setAttribute('data-pose',a.pose);
+  $('petTag').textContent='# '+a.tag;
+  var say=$('petSay');
+  say.textContent=a.say; say.style.display='block';
+  say.classList.remove('show'); void say.offsetWidth; say.classList.add('show');
+  if(petSayTimer) clearTimeout(petSayTimer);
+  petSayTimer=setTimeout(function(){ say.style.display='none'; },2800);
+}
+function initPet(){
+  var pet=$('aiPet'), start=null, moved=false, main=document.querySelector('.main');
+  pet.addEventListener('pointerdown',function(e){
+    if(e.target.closest && e.target.closest('.pet-x,.pet-ask')) return;
+    var r=pet.getBoundingClientRect(), m=main.getBoundingClientRect();
+    start={x:e.clientX,y:e.clientY,l:r.left-m.left,t:r.top-m.top}; moved=false;
+    try{ pet.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  pet.addEventListener('pointermove',function(e){
+    if(!start) return;
+    var dx=e.clientX-start.x, dy=e.clientY-start.y;
+    if(Math.abs(dx)+Math.abs(dy)>5) moved=true;
+    if(moved){
+      pet.style.left=Math.max(0,Math.min(start.l+dx,main.clientWidth-100))+'px';
+      pet.style.top=Math.max(0,start.t+dy)+'px';
+      pet.style.right='auto'; pet.style.bottom='auto';
+    }
+  });
+  pet.addEventListener('pointerup',function(){
+    if(!start) return;
+    start=null;
+    if(!moved) cyclePet();
+  });
+  pet.addEventListener('pointercancel',function(){ start=null; });
+}
+function hidePet(){
+  $('aiPet').style.display='none'; $('petRestore').style.display='block';
+  toast('小星收起来啦，点右下角可以唤回','ok');
+}
+function showPet(){
+  $('aiPet').style.display='flex'; $('petRestore').style.display='none';
+  cyclePet();
+}
+function petQuickAsk(){
+  if(state.scope!=='all'){ toast('请切回「群聊大厅」再找小星','err'); return; }
+  var el=$('input'), v=el.value.trim();
+  el.value=v?(hasMention(v)?v:MENTION+' '+v):MENTION+' ';
+  el.focus();
+  toast('已填好 @小星，写点内容按发送就能让小星接话','ok');
+}
 function avatarClass(m){
   if(m.kind==='ai') return '';          // AI 保留品牌紫
   if(m.kind==='system') return 'av-sys';
@@ -1427,7 +1861,7 @@ function seedWelcome(){
   Store.list().then(function(a){
     var has = a.some(function(m){ return m.kind==='system'; });
     if(!has){
-      return Store.add({ mid:uid(), ownerId:'system', ownerName:'系统', content:'欢迎来到星火聊天室！可以发图片 / 文件 / 语音，侧栏「好友」能加好友私聊，「数据库」里有消息表 / 账号表 / 好友关系表三张原始表。想让小星接话，消息里带上 @小星 即可。右上角可以切换亮 / 暗主题，还有 5 套聊天气泡样式随你挑～', kind:'system', createdAt:nowISO() });
+      return Store.add({ mid:uid(), ownerId:'system', ownerName:'系统', content:'欢迎来到星火聊天室！可以发图片 / 文件 / 语音 / 表情包，侧栏「好友」能加好友私聊，「数据库」里有消息表 / 账号表 / 好友关系表三张原始表。右下角悬浮的小星点一下会换动作，消息里带 @小星 就能让它接话。右上角可以切换亮 / 暗主题，还有 13 套个性装扮气泡随你挑～', kind:'system', createdAt:nowISO() });
     }
   }).then(refresh).catch(function(){});
 }
@@ -1559,9 +1993,11 @@ function renderDb(list){
       if(hasImg) att='<img class="zoomable" style="max-width:70px;max-height:48px;border-radius:6px;cursor:zoom-in" src="'+esc(m.image)+'" alt="图片" title="点击查看大图"><div class="mono">image/'+Math.round(m.image.length*0.75/1024)+'KB</div>';
       else if(m.file && typeof m.file.data==='string' && m.file.data.indexOf('data:')===0)
         att='<div>📎 '+esc(m.file.name||'')+'</div><div class="mono">file/'+esc(FILE.kb(m.file.size))+'</div>';
-      else if(m.audio && typeof m.audio.data==='string' && m.audio.data.indexOf('data:')===0)
-        att='<div>🎤 语音 '+(m.audio.dur||1)+'″</div><div class="mono">audio/'+esc(FILE.kb(m.audio.bytes))+'</div>';
-      else att='<span style="color:#bbb">—</span>';
+    else if(m.audio && typeof m.audio.data==='string' && m.audio.data.indexOf('data:')===0)
+      att='<div>🎤 语音 '+(m.audio.dur||1)+'″</div><div class="mono">audio/'+esc(FILE.kb(m.audio.bytes))+'</div>';
+    else if(m.sticker && STICKER_BY_ID[m.sticker])
+      att='<div>🎀 '+esc(STICKER_BY_ID[m.sticker].name)+'</div><div class="mono">sticker/'+esc(m.sticker)+'</div>';
+    else att='<span style="color:#bbb">—</span>';
       var scopeCell=m.dm
         ? '<span class="k" style="background:#fff0e6;color:#c26a20">私聊→'+esc(m.toName||m.toUid||'')+'</span>'
         : '<span style="color:#bbb">群聊</span>';
@@ -1621,31 +2057,33 @@ function render(list){
             : m.kind==='system' ? '系统公告'
             : esc(m.ownerName);
     var pmTag = m.dm ? '<span class="pm-badge">私聊'+(m.toName?' → '+esc(m.toName):'')+'</span>' : '';
-    // 附件优先级：图片 > 文件 > 语音；只信任 data: 前缀，杜绝注入
+    // 附件优先级：图片 > 文件 > 语音 > 表情包 > 文字；只信任 data: 前缀 / 白名单 id，杜绝注入
     var inner;
     if(typeof m.image==='string' && m.image.indexOf('data:image/')===0){
-      inner = '<div class="bubble hasimg"><img class="zoomable" src="'+esc(m.image)+'" alt="图片">'
-            + (m.content && m.content!=='[图片]' ? '<div class="img-cap">'+esc(m.content)+'</div>' : '')
-            + '</div>';
+      inner = bubbleHTML('<img class="zoomable" src="'+esc(m.image)+'" alt="图片">'
+            + (m.content && m.content!=='[图片]' ? '<div class="img-cap">'+esc(m.content)+'</div>' : ''),'hasimg');
     }else if(m.file && safeDataURL(m.file.data)){
       ATT_CACHE[m.mid]={data:m.file.data, name:m.file.name||'下载文件'};
-      inner = '<div class="bubble hasatt"><div class="file-card">'
+      inner = bubbleHTML('<div class="file-card">'
             + '<div class="file-ico">'+esc(FILE.ext(m.file.name))+'</div>'
             + '<div class="file-meta"><div class="file-name" title="'+esc(m.file.name)+'">'+esc(m.file.name)+'</div>'
             + '<div class="file-size">'+esc(FILE.kb(m.file.size))+' · '+esc(m.file.type||'未知类型')+'</div></div>'
             + '<button class="file-dl" data-dl="'+esc(m.mid)+'">下载</button>'
-            + '</div>'+(m.content && m.content.indexOf('[文件]')!==0 ? '<div class="img-cap">'+esc(m.content)+'</div>':'')
-            + '</div>';
+            + '</div>'+(m.content && m.content.indexOf('[文件]')!==0 ? '<div class="img-cap">'+esc(m.content)+'</div>':''),'hasatt');
     }else if(m.audio && safeDataURL(m.audio.data)){
       ATT_CACHE[m.mid]={data:m.audio.data, name:'语音消息'};
       var dur=m.audio.dur||1;
       var bars=''; for(var j=0;j<18;j++){ bars+='<i style="height:'+(5+((j*7+3)%15))+'px"></i>'; }
-      inner = '<div class="bubble hasatt"><div class="voice-card">'
+      inner = bubbleHTML('<div class="voice-card">'
             + '<button class="voice-play" data-play="'+esc(m.mid)+'" title="播放语音">▶</button>'
             + '<div class="voice-track"><div class="voice-bars">'+bars+'</div>'
-            + '<div class="voice-time">🔊 '+dur+'″ 语音 · 点击播放</div></div></div></div>';
+            + '<div class="voice-time">🔊 '+dur+'″ 语音 · 点击播放</div></div></div>','hasatt');
+    }else if(m.sticker && STICKER_BY_ID[m.sticker]){
+      var st=STICKER_BY_ID[m.sticker];
+      inner = bubbleHTML('<div class="sticker-box">'+stickerSVG(m.sticker)
+            +'<div class="sticker-cap">'+esc(st.name)+'</div></div>','sticker-bub');
     }else{
-      inner = '<div class="bubble">'+esc(m.content)+'</div>';
+      inner = bubbleHTML(esc(m.content));
     }
     parts.push('<div class="'+cls+'"><div class="mav '+avatarClass(m)+'">'+esc((m.ownerName||'?').slice(0,1))+'</div>'+
       '<div class="body"><div class="meta"><span class="who">'+who+'</span>'+pmTag+
@@ -1659,7 +2097,7 @@ function render(list){
   if(state.asking && (state.scope==='all'||state.scope==='mine')){
     box.insertAdjacentHTML('beforeend','<div class="msg ai typing"><div class="mav av-sys">✦</div><div class="body">'+
       '<div class="meta"><span class="who">小星 · 智能助手</span><span class="mtime">正在输入</span></div>'+
-      '<div class="bubble"><i></i><i></i><i></i></div></div></div>');
+      '<div class="bubble">'+cuteDeco()+'<i></i><i></i><i></i></div></div></div>');
   }
   if(forceBottom || atBottom || hasNew) box.scrollTop=box.scrollHeight;
   box.querySelectorAll('[data-mid]').forEach(function(b){
@@ -1834,6 +2272,7 @@ function send(text, kind, image, extra){
   if(extra){
     if(extra.file)  msg.file  = extra.file;   // 文件：{name,size,type,data}
     if(extra.audio) msg.audio = extra.audio; // 语音：{data,dur,mime,bytes}
+    if(extra.sticker && STICKER_BY_ID[extra.sticker]) msg.sticker = extra.sticker; // 表情包：白名单 id
     if(extra.dm){ msg.dm=true; msg.toUid=extra.dm.to; msg.toName=extra.dm.toName; } // 私聊
   }
   return Store.add(msg).then(refresh).then(function(){ return true; });
@@ -1994,7 +2433,7 @@ function buildHistory(meId, excludeMid){
       var isAI = m.kind==='ai';
       if(!isMine && !isAI) continue;
       var c=String(m.content||'').trim();
-      if(!c || c==='[图片]' || c.indexOf('[文件]')===0 || c.indexOf('[语音]')===0) continue;
+      if(!c || c==='[图片]' || c.indexOf('[文件]')===0 || c.indexOf('[语音]')===0 || c.indexOf('[表情包]')===0) continue;
       picked.push({ role: isAI?'assistant':'user', content:c.slice(0,300) });
     }
     return picked.slice(-10); // 最近 10 条（约 5 轮）
@@ -2094,15 +2533,38 @@ function loadCloudSDK(cb){
 document.addEventListener('DOMContentLoaded',function(){
   initTheme();
   initBubble();
+  initPet();
   $('btnTheme').addEventListener('click',toggleTheme);
   $('btnThemeEntry').addEventListener('click',toggleTheme);
-  $('btnBubble').addEventListener('click',function(){ toggleBubblePop(); });
-  // 点面板外任意处 / 按 Esc 收起气泡选择面板
-  document.addEventListener('pointerdown',function(e){
-    var w=document.querySelector('.bubble-wrap');
-    if(w && !w.contains(e.target)) closeBubblePop();
+  $('btnBubble').addEventListener('click',function(){ closeStickerPop(); toggleBubblePop(); });
+  // 表情包面板
+  $('btnSticker').addEventListener('click',function(){ closeBubblePop(); toggleStickerPop(); });
+  $('spClose').addEventListener('click',closeStickerPop);
+  document.querySelectorAll('[data-sptab]').forEach(function(b){
+    b.addEventListener('click',function(){ switchStickerTab(b.getAttribute('data-sptab')); });
   });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeBubblePop(); });
+  $('spEmoji').addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('[data-emoji]');
+    if(b) insertEmoji(b.getAttribute('data-emoji'));
+  });
+  $('spPack').addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('[data-sticker]');
+    if(b) sendSticker(b.getAttribute('data-sticker'));
+  });
+  // 悬浮小星
+  $('petHide').addEventListener('click',hidePet);
+  $('petRestore').addEventListener('click',showPet);
+  $('petAsk').addEventListener('click',petQuickAsk);
+  // 点面板外任意处 / 按 Esc 收起两个弹出面板
+  document.addEventListener('pointerdown',function(e){
+    var bw=document.querySelector('.bubble-wrap');
+    if(bw && !bw.contains(e.target)) closeBubblePop();
+    var sw=document.querySelector('.sticker-wrap');
+    if(sw && !sw.contains(e.target)) closeStickerPop();
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){ closeBubblePop(); closeStickerPop(); }
+  });
   $('modalOk').addEventListener('click',function(){ closeModal(true); });
   $('modalCancel').addEventListener('click',function(){ closeModal(false); });
   $('modal').addEventListener('click',function(e){ if(e.target===this) closeModal(false); });
