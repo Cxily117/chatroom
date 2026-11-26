@@ -406,7 +406,142 @@ body,.card,.side,.head,.composer,.bubble,.me,.nav,.dbtab,.fr-row,.fr-tab,.imgbtn
   .badge{font-size:11px;padding:5px 9px}
   .dbtab{font-size:11px}
   .dbtab th,.dbtab td{padding:8px 7px}
+  .bubble-pop{width:min(248px,calc(100vw - 28px))}
 }
+/* ==================== 数据库视图：多表切换 ==================== */
+.db-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.db-tab{padding:8px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);
+  color:var(--muted);font-size:12px;font-weight:650;cursor:pointer;transition:.15s}
+.db-tab:hover{border-color:var(--primary);color:var(--primary)}
+.db-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.db-note{font-size:12px;line-height:1.8;color:var(--muted);background:var(--surface);
+  border:1px dashed var(--border2);border-radius:10px;padding:11px 14px;margin:0 0 14px}
+.db-note b{color:var(--primary)}
+.db-note code{font-family:Consolas,Monaco,monospace;font-size:11px;background:var(--card);
+  border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+.db-mask{font-family:Consolas,Monaco,monospace;font-size:11px;color:var(--muted)}
+.db-tag{display:inline-block;padding:2px 8px;border-radius:9px;font-size:11px;font-weight:650;
+  background:var(--soft);color:var(--primary)}
+.db-tag.ok{background:#e6f7ef;color:#2a9d6a}
+/* ==================== 气泡样式选择面板 ==================== */
+.bubble-wrap{position:relative}
+.bubble-pop{position:absolute;top:46px;right:0;width:252px;z-index:60;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-md);
+  padding:12px;animation:zoomIn .2s var(--ease)}
+.bp-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;
+  color:var(--text);padding:2px 4px 10px}
+.bp-head span{font-size:11px;font-weight:600;color:var(--primary)}
+.bp-list{display:flex;flex-direction:column;gap:3px}
+.bp-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:1px solid transparent;
+  border-radius:10px;background:transparent;cursor:pointer;text-align:left;transition:.15s}
+.bp-item:hover{background:var(--hover)}
+.bp-item.on{background:var(--soft);border-color:var(--border2)}
+.bp-preview{flex-shrink:0;width:52px;height:34px;position:relative;background:var(--surface);
+  border-radius:7px;overflow:hidden}
+.bp-preview i,.bp-preview b{position:absolute;display:block;height:10px;border-radius:6px}
+.bp-preview i{left:5px;top:5px;width:26px;background:#dcdfea;border:1px solid #c9cddd}
+.bp-preview b{right:5px;top:18px;width:28px;background:var(--primary)}
+.bp-classic i{border-bottom-left-radius:2px}
+.bp-classic b{border-bottom-right-radius:2px}
+.bp-flat i,.bp-flat b{border-radius:3px;box-shadow:none}
+.bp-flat i{border-left:3px solid var(--primary)}
+.bp-flat b{border-right:3px solid var(--primary2)}
+.bp-glass{background:linear-gradient(135deg,#e9e5ff,#dff6ff)}
+.bp-glass i{background:rgba(255,255,255,.72);border-color:rgba(255,255,255,.95)}
+.bp-glass b{background:linear-gradient(135deg,rgba(124,108,255,.88),rgba(90,73,240,.88));
+  border:1px solid rgba(255,255,255,.45);border-radius:9px}
+.bp-neon{background:#f7f4ff}
+.bp-neon i{background:#fff;border-color:#e3d9ff;border-radius:9px}
+.bp-neon b{background:linear-gradient(135deg,#7c6cff,#ff79b8);border-radius:9px;
+  box-shadow:0 2px 7px rgba(124,108,255,.45)}
+.bp-note{background:repeating-linear-gradient(0deg,#fffdf3,#fffdf3 9px,#f4eedb 10px)}
+.bp-note i{background:#fffdf3;border-color:#ece2c2;border-radius:2px 7px 7px 7px}
+.bp-note b{background:#fff3d6;border:1px solid #e9d6a2;border-radius:7px 2px 7px 7px}
+.bp-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bp-name{font-size:13px;font-weight:650;color:var(--text);white-space:nowrap}
+.bp-desc{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bp-check{margin-left:auto;width:16px;height:16px;flex-shrink:0;color:var(--primary);opacity:0}
+.bp-item.on .bp-check{opacity:1}
+.bp-foot{font-size:10px;color:var(--muted);line-height:1.7;padding:10px 4px 2px;
+  margin-top:8px;border-top:1px solid var(--border)}
+/* ==================== 气泡皮肤：5 套可切换（classic=默认，无需覆盖） ==================== */
+/* 非经典样式统一收起小尾巴，保持造型干净 */
+html[data-bubble="flat"] .bubble:not(.hasimg):not(.hasatt)::after,
+html[data-bubble="glass"] .bubble:not(.hasimg):not(.hasatt)::after,
+html[data-bubble="neon"] .bubble:not(.hasimg):not(.hasatt)::after,
+html[data-bubble="note"] .bubble:not(.hasimg):not(.hasatt)::after{display:none}
+/* ② 简约扁平：直角、细边、无阴影、左右色条 */
+html[data-bubble="flat"] .msg .bubble{border-radius:8px;box-shadow:none;background:var(--card);
+  color:var(--text);border:1px solid var(--border2);border-left:3px solid var(--primary)}
+html[data-bubble="flat"] .msg.mine .bubble{background:var(--primary);color:#fff;
+  border:1px solid var(--primary);border-right:3px solid var(--primary2)}
+html[data-bubble="flat"] .msg.ai .bubble{border-left-color:var(--ok)}
+/* ③ 玻璃拟态：半透明磨砂 + 背景光晕 */
+html[data-bubble="glass"] .msgs{
+  background:radial-gradient(circle at 12% 18%,rgba(124,108,255,.20) 0,transparent 38%),
+             radial-gradient(circle at 88% 70%,rgba(80,190,220,.18) 0,transparent 40%),
+             radial-gradient(circle at 58% 96%,rgba(255,140,200,.14) 0,transparent 35%),var(--bg)}
+html[data-bubble="glass"] .msg .bubble{background:rgba(255,255,255,.62);color:var(--text);
+  border:1px solid rgba(255,255,255,.78);border-radius:20px;
+  box-shadow:0 8px 28px rgba(31,35,51,.10),inset 0 1px 0 rgba(255,255,255,.6);
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4)}
+html[data-bubble="glass"] .msg.mine .bubble{
+  background:linear-gradient(135deg,rgba(124,108,255,.9),rgba(90,73,240,.9));
+  color:#fff;border-color:rgba(255,255,255,.38)}
+html[data-bubble="glass"] .msg.ai .bubble{background:rgba(238,232,255,.72)}
+html[data-theme="dark"][data-bubble="glass"] .msgs{
+  background:radial-gradient(circle at 12% 18%,rgba(124,108,255,.22) 0,transparent 38%),
+             radial-gradient(circle at 88% 70%,rgba(60,160,200,.16) 0,transparent 40%),var(--bg)}
+html[data-theme="dark"][data-bubble="glass"] .msg .bubble{background:rgba(38,42,60,.66);
+  color:var(--text);border-color:rgba(255,255,255,.14)}
+html[data-theme="dark"][data-bubble="glass"] .msg.ai .bubble{background:rgba(70,58,120,.58)}
+/* ④ 渐变霓虹：紫粉渐变 + 柔光 */
+html[data-bubble="neon"] .msg .bubble{background:linear-gradient(135deg,#fff,#f4f0ff);
+  color:var(--text);border:1px solid #e3d9ff;border-radius:18px;
+  box-shadow:0 6px 18px rgba(109,94,252,.12)}
+html[data-bubble="neon"] .msg.mine .bubble{
+  background:linear-gradient(135deg,#7c6cff 0%,#a35cff 52%,#ff79b8 100%);
+  color:#fff;border:none;border-radius:18px;
+  box-shadow:0 8px 24px rgba(124,108,255,.38),inset 0 0 0 1px rgba(255,255,255,.18)}
+html[data-bubble="neon"] .msg.ai .bubble{background:linear-gradient(135deg,#fff,#e9fbff);border-color:#cdeef5}
+html[data-theme="dark"][data-bubble="neon"] .msg .bubble{
+  background:linear-gradient(135deg,#242838,#2c2746);color:var(--text);border-color:#3a3458}
+html[data-theme="dark"][data-bubble="neon"] .msg.ai .bubble{
+  background:linear-gradient(135deg,#202a38,#243c48);border-color:#33536a}
+/* ⑤ 手账便签：纸张底纹 + 折角 + 深色文字（附件卡片同步换成纸色） */
+html[data-bubble="note"] .msgs{
+  background:repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(0,0,0,.022) 28px),var(--bg)}
+html[data-bubble="note"] .msg .bubble{background:#fffdf3;color:#3a3527;
+  border:1px solid #ece2c2;border-radius:3px 16px 16px 16px;
+  box-shadow:2px 3px 0 rgba(180,160,100,.16);
+  font-family:"Kaiti SC","STKaiti","KaiTi","Segoe UI","Microsoft YaHei",sans-serif}
+html[data-bubble="note"] .msg.mine .bubble{background:#fff3d6;color:#43391f;
+  border-color:#e9d6a2;border-radius:16px 3px 16px 16px}
+html[data-bubble="note"] .msg.ai .bubble{background:#f0f8ee;border-color:#d5e8cf}
+html[data-bubble="note"] .msg.mine .file-card{background:#fffdf3;border-color:#e9d6a2;color:#43391f}
+html[data-bubble="note"] .msg.mine .file-ico{background:#f3e7c6;color:#8a6d28}
+html[data-bubble="note"] .msg.mine .file-dl{background:#8a6d28;color:#fff}
+html[data-bubble="note"] .msg.mine .voice-play{background:#f3e7c6;color:#8a6d28}
+html[data-bubble="note"] .msg.mine .voice-bars i{background:#8a6d28}
+html[data-bubble="note"] .msg.mine .bubble .img-cap{color:#43391f}
+html[data-theme="dark"][data-bubble="note"] .msg .bubble{background:#2b2a22;color:#eee6cf;
+  border-color:#4a4530;box-shadow:2px 3px 0 rgba(0,0,0,.3)}
+html[data-theme="dark"][data-bubble="note"] .msg.mine .bubble{background:#3a3320;color:#f5ead0;border-color:#6b5c33}
+html[data-theme="dark"][data-bubble="note"] .msg.ai .bubble{background:#25302a;border-color:#3f5647}
+html[data-theme="dark"][data-bubble="note"] .msg.mine .file-card{background:#2b2a22;
+  border-color:#6b5c33;color:#f5ead0}
+/* 暗色通用规则与皮肤规则的优先级相同且写在后面，会误伤「自己发的」气泡；
+   这里用更高优先级把每套皮肤的主色补回来（亮/暗两套主题都保持同一风格识别度） */
+html[data-theme="dark"][data-bubble="flat"] .msg.mine .bubble{
+  background:var(--primary);color:#fff;border:1px solid var(--primary);border-right:3px solid var(--primary2)}
+html[data-theme="dark"][data-bubble="glass"] .msg.mine .bubble{
+  background:linear-gradient(135deg,rgba(124,108,255,.9),rgba(90,73,240,.9));
+  color:#fff;border-color:rgba(255,255,255,.28)}
+html[data-theme="dark"][data-bubble="neon"] .msg.mine .bubble{
+  background:linear-gradient(135deg,#7c6cff 0%,#a35cff 52%,#ff79b8 100%);color:#fff;border:none;
+  box-shadow:0 8px 24px rgba(124,108,255,.38),inset 0 0 0 1px rgba(255,255,255,.18)}
+html[data-theme="dark"][data-bubble="note"] .msg.mine .bubble{
+  background:#3a3320;color:#f5ead0;border-color:#6b5c33}
 </style>
 <script>
 /* 如需接云端：把下面 env 改成你的腾讯云环境 ID；留空 = 本地存储模式（也能完整体验） */
@@ -429,6 +564,11 @@ window.CHAT_CONFIG = {
     t=(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
   }
   document.documentElement.setAttribute('data-theme', t);
+  // 气泡样式同样在绘制前定好，避免刷新时先闪一下默认样式
+  try{
+    var b=window.localStorage.getItem('spark_chat_bubble_v1');
+    if(/^(classic|flat|glass|neon|note)$/.test(b||'')) document.documentElement.setAttribute('data-bubble',b);
+  }catch(e){}
 })();
 </script>
 </head>
@@ -450,6 +590,7 @@ window.CHAT_CONFIG = {
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
   <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.8.3-1.3.9-1.3 1.8v.4"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.4a1.9 1.9 0 0 0 1.5-3.1 1.9 1.9 0 0 1 1.5-3.1H19a2 2 0 0 0 2-2.1A9 9 0 0 0 12 3z"/><circle cx="7.6" cy="11.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.2" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="17.3" cy="10.4" r="1.1" fill="currentColor" stroke="none"/></symbol>
 </svg>
 
 <!-- ==================== 登录 / 注册界面 ==================== -->
@@ -522,6 +663,17 @@ window.CHAT_CONFIG = {
       <div class="desc" id="chatDesc"></div>
     </div><div class="head-ops">
       <div class="badge" id="badge">检测中</div>
+      <div class="bubble-wrap">
+        <button class="theme-btn" id="btnBubble" title="选择聊天气泡样式" aria-label="选择气泡样式"
+                aria-haspopup="true" aria-expanded="false">
+          <svg class="ic"><use href="#i-palette"></use></svg>
+        </button>
+        <div class="bubble-pop" id="bubblePop" style="display:none" role="menu">
+          <div class="bp-head">气泡样式 <span id="bpCurrent">经典圆润</span></div>
+          <div class="bp-list" id="bpList"></div>
+          <div class="bp-foot">只影响本机显示 · 刷新后自动保留<br>点一下即可实时预览并切换</div>
+        </div>
+      </div>
       <button class="theme-btn" id="btnTheme" title="切换亮 / 暗主题" aria-label="切换主题">
         <svg class="ic ic-moon"><use href="#i-moon"></use></svg><svg class="ic ic-sun"><use href="#i-sun"></use></svg>
       </button>
@@ -1037,7 +1189,7 @@ var AI = {
     var s=String(q||'');
     if(/你好|hi|hello|在吗/i.test(s)) return '你好！我是小星 ✦ 星火聊天室的智能助手。输入消息就能群聊，问我问题我会尽力回答。';
     if(/你是谁|介绍|什么功能|能做什么/.test(s))
-      return '我是小星 ✦ 这个聊天室支持：账号注册登录、群聊大厅、发图片/文件/语音、加好友与私聊、「个人」视图、owner_id 归属隔离、60 秒 8 条限流，还有我在线答疑。';
+      return '我是小星 ✦ 这个聊天室支持：账号注册登录（账号表单独存哈希密码）、群聊大厅、发图片/文件/语音、加好友与私聊、「个人」视图、owner_id 归属隔离、60 秒 8 条限流，还有亮/暗主题与 5 套气泡皮肤，以及我在线答疑。';
     if(/文件|上传|附件|语音|录音|好友|私聊|加好友/.test(s))
       return '工具栏有「图片 / 文件 / 语音」三个按钮；侧栏「好友」可以搜索账号、发申请、同意后私聊。私聊消息带 toUid，群聊大厅严格过滤，不会串消息。';
     if(/架构|技术|前后端|什么语言|怎么实现/.test(s))
@@ -1083,7 +1235,7 @@ var AI = {
 
 /* ===== 界面 UI：前端同学主要负责这一段 ===== */
 var state={ me:null, scope:'all', timer:null, asking:false, composing:false,
-  frTab:'friends', frQuery:'', pmPeer:null, _audio:null, _playBtn:null };
+  frTab:'friends', frQuery:'', pmPeer:null, _audio:null, _playBtn:null, dbTab:'messages' };
 
 /* ===== 视觉组件：主题 / Toast / 确认框 / 渲染辅助 ===== */
 var SEEN = {};        // 已渲染过的 mid：只有新消息才播入场动画，轮询重绘不闪
@@ -1136,6 +1288,70 @@ function toggleTheme(){
   try{ SafeLS.setItem('spark_chat_theme_v1',next); }catch(e){}
   toast(next==='dark'?'已切换到暗色主题':'已切换到亮色主题','ok');
 }
+
+/* ===== 气泡皮肤：5 套样式，用户自选并持久化 =====
+   只改 <html data-bubble="...">，样式全部由 CSS 变量/选择器驱动，
+   不影响消息数据，也不影响云端同步；离线/本地模式同样可用。 */
+var BUBBLE_KEY='spark_chat_bubble_v1';
+var BUBBLE_STYLES=[
+  {id:'classic',name:'经典圆润',desc:'默认 · 带小尾巴'},
+  {id:'flat',   name:'简约扁平',desc:'直角细边 · 干净利落'},
+  {id:'glass',  name:'玻璃拟态',desc:'半透明磨砂 · 柔光'},
+  {id:'neon',   name:'渐变霓虹',desc:'紫粉渐变 · 发光'},
+  {id:'note',   name:'手账便签',desc:'纸张质感 · 暖色'}
+];
+function bubbleStyle(){
+  var v=document.documentElement.getAttribute('data-bubble');
+  return BUBBLE_STYLES.some(function(s){ return s.id===v; })?v:'classic';
+}
+function applyBubble(id){
+  if(!BUBBLE_STYLES.some(function(s){ return s.id===id; })) id='classic';
+  document.documentElement.setAttribute('data-bubble',id);
+  var s=BUBBLE_STYLES.filter(function(x){ return x.id===id; })[0];
+  var cur=$('bpCurrent'); if(cur && s) cur.textContent=s.name;
+  var list=$('bpList');
+  if(list) list.querySelectorAll('.bp-item').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-bp')===id);
+  });
+  var btn=$('btnBubble'), pop=$('bubblePop');
+  if(btn && pop) btn.setAttribute('aria-expanded', pop.style.display!=='none'?'true':'false');
+}
+function initBubble(){
+  var t=null;
+  try{ t=SafeLS.getItem(BUBBLE_KEY); }catch(e){}
+  applyBubble(t||'classic');
+}
+function renderBubblePop(){
+  var list=$('bpList'); if(!list) return;
+  if(!list.childNodes.length){
+    list.innerHTML=BUBBLE_STYLES.map(function(s){
+      return '<button class="bp-item" type="button" data-bp="'+s.id+'" role="menuitem">'
+        +'<span class="bp-preview bp-'+s.id+'"><i></i><b></b></span>'
+        +'<span class="bp-text"><span class="bp-name">'+esc(s.name)+'</span>'
+        +'<span class="bp-desc">'+esc(s.desc)+'</span></span>'
+        +'<svg class="ic bp-check"><use href="#i-check"></use></svg></button>';
+    }).join('');
+    list.querySelectorAll('.bp-item').forEach(function(b){
+      b.addEventListener('click',function(){
+        var id=b.getAttribute('data-bp');
+        applyBubble(id);
+        try{ SafeLS.setItem(BUBBLE_KEY,id); }catch(e){}
+        closeBubblePop();
+        var s=BUBBLE_STYLES.filter(function(x){ return x.id===id; })[0];
+        toast('已切换气泡样式：'+(s?s.name:id),'ok');
+      });
+    });
+  }
+  applyBubble(bubbleStyle());
+}
+function toggleBubblePop(force){
+  var p=$('bubblePop'); if(!p) return;
+  var open=(typeof force==='boolean')?force:(p.style.display==='none');
+  p.style.display=open?'block':'none';
+  $('btnBubble').setAttribute('aria-expanded',open?'true':'false');
+  if(open) renderBubblePop();
+}
+function closeBubblePop(){ toggleBubblePop(false); }
 function avatarClass(m){
   if(m.kind==='ai') return '';          // AI 保留品牌紫
   if(m.kind==='system') return 'av-sys';
@@ -1211,7 +1427,7 @@ function seedWelcome(){
   Store.list().then(function(a){
     var has = a.some(function(m){ return m.kind==='system'; });
     if(!has){
-      return Store.add({ mid:uid(), ownerId:'system', ownerName:'系统', content:'欢迎来到星火聊天室！可以发图片 / 文件 / 语音，侧栏「好友」能加好友私聊，「数据库」能看原始记录。想让小星接话，消息里带上 @小星 即可。还可以点右上角切换亮 / 暗主题。', kind:'system', createdAt:nowISO() });
+      return Store.add({ mid:uid(), ownerId:'system', ownerName:'系统', content:'欢迎来到星火聊天室！可以发图片 / 文件 / 语音，侧栏「好友」能加好友私聊，「数据库」里有消息表 / 账号表 / 好友关系表三张原始表。想让小星接话，消息里带上 @小星 即可。右上角可以切换亮 / 暗主题，还有 5 套聊天气泡样式随你挑～', kind:'system', createdAt:nowISO() });
     }
   }).then(refresh).catch(function(){});
 }
@@ -1247,45 +1463,125 @@ function refresh(){
 }
 function box_noop(){}
 
-/* 数据库视图：把底层存储的原始记录以表格展示，老师检查时可直接看到库里的字段 */
+/* 数据库视图：三张表切换，把底层存储的原始记录摊开给老师检查
+   ① 消息表 chat_messages ② 账号表 users（登录/注册） ③ 好友关系表 social */
+function dbBackendName(){
+  return ({local:'localStorage',session:'sessionStorage',cookie:'Cookie',name:'window.name',memory:'内存'}[SafeLS.backend()]||'本地');
+}
+function dbTable(head, rows, emptyTxt, cols){
+  return '<table class="dbtab"><thead><tr>'+head+'</tr></thead><tbody>'
+    + (rows || '<tr><td colspan="'+(cols||8)+'" style="text-align:center;color:var(--muted);padding:22px">'+esc(emptyTxt||'暂无记录')+'</td></tr>')
+    + '</tbody></table>';
+}
+function dbUsersHTML(cloud){
+  var local=Auth.users(), rows=[], seen={};
+  Object.keys(local).forEach(function(k){
+    seen[k]=true;
+    var u=local[k]||{};
+    rows.push({uid:k,nick:u.nickname||k,pass:u.pass||'',createdAt:u.createdAt||'',from:'本机'});
+  });
+  if(cloud){
+    Object.keys(CloudSync.profiles).forEach(function(k){
+      if(seen[k]){
+        rows.forEach(function(r){ if(r.uid===k) r.from='本机 + 云端'; });
+        return;
+      }
+      var p=CloudSync.profiles[k];
+      rows.push({uid:k,nick:p.nickname||k,pass:p.pass||'',createdAt:p.createdAt||'',from:'云端'});
+    });
+  }
+  var note='<div class="db-note">这张表存的是<b>注册 / 登录用的账号</b>，和上面的消息表是两套独立数据。'
+    +'本地模式存 <code>spark_chat_users_v1</code>；云端模式存集合里 <code>kind=profile</code> 的记录（用来跨设备同步账号目录）。<br>'
+    +'<b>密码不存明文</b>：只保存哈希值，登录时把输入做同样哈希再比对；这里对哈希做了遮罩显示。<br>'
+    +'⚠ 课堂演示边界：本地账号只在这台浏览器有效；云端集合若设为「所有用户可读写」，哈希对访问者可读，正式产品应改为云函数 + 服务端校验。</div>';
+  var rs=rows.length?rows.map(function(r){
+    var ph=String(r.pass||'');
+    var mask=ph?(ph.slice(0,6)+' …（已遮罩 · 共 '+ph.length+' 位）'):'—';
+    return '<tr><td class="mono">'+esc(r.uid)+'</td><td>'+esc(r.nick)+'</td>'
+      +'<td class="db-mask">'+esc(mask)+'</td>'
+      +'<td><span class="db-tag'+(r.from.indexOf('云端')>=0?' ok':'')+'">'+esc(r.from)+'</span></td>'
+      +'<td class="mono">'+esc((r.createdAt||'').replace('T',' ').slice(0,19))+'</td></tr>';
+  }).join(''):'';
+  return note+dbTable('<th>账号 uid</th><th>昵称</th><th>密码哈希（遮罩）</th><th>数据来源</th><th>注册时间</th>',rs,'还没有注册账号，退出后注册一个就能在这里看到',5);
+}
+function dbSocialHTML(cloud){
+  var d=Social.data(), reqs=d.requests||[], frs=d.friends||[];
+  var note='<div class="db-note">这张表存的是<b>好友申请与好友关系</b>。本地模式存 <code>spark_chat_social_v1</code>；'
+    +'云端模式存 <code>kind=social</code> 的 append-only 事件流（request / accept / reject / friend / remove），'
+    +'按时间重放成下面的状态，多设备并发写不会互相覆盖。</div>';
+  var rs=reqs.length?reqs.map(function(r){
+    var st=r.status==='pending'?'待处理':(r.status==='accepted'?'已同意':'已拒绝');
+    return '<tr><td class="mono">'+esc(r.id||'')+'</td><td>'+esc(r.fromName||r.from||'')+'</td>'
+      +'<td>'+esc(r.toName||r.to||'')+'</td>'
+      +'<td><span class="db-tag'+(r.status==='accepted'?' ok':'')+'">'+st+'</span></td>'
+      +'<td class="mono">'+esc((r.createdAt||'').replace('T',' ').slice(0,19))+'</td></tr>';
+  }).join(''):'';
+  var fs=frs.length?frs.map(function(f){
+    return '<tr><td class="mono">'+esc(f.a||'')+'</td><td>'+esc(f.aName||'')+'</td>'
+      +'<td class="mono">'+esc(f.b||'')+'</td><td>'+esc(f.bName||'')+'</td>'
+      +'<td class="mono">'+esc((f.createdAt||'').replace('T',' ').slice(0,19))+'</td></tr>';
+  }).join(''):'';
+  return note
+    +'<div class="fr-sec">好友申请（'+reqs.length+'）</div>'
+    + dbTable('<th>申请 id</th><th>发起人</th><th>接收人</th><th>状态</th><th>时间</th>',rs,'还没有好友申请',5)
+    +'<div class="fr-sec">好友关系（'+frs.length+'）</div>'
+    + dbTable('<th>账号 A</th><th>A 昵称</th><th>账号 B</th><th>B 昵称</th><th>建立时间</th>',fs,'还没有好友',5);
+}
 function renderDb(list){
-  var box=$('msgs');
-  var cloud = Store.mode==='cloud';
-  var src = cloud ? '腾讯云云数据库集合「'+CFG.collection+'」' : '浏览器本地存储（'+({local:'localStorage',session:'sessionStorage',cookie:'Cookie',name:'window.name',memory:'内存'}[SafeLS.backend()]||'本地')+'）';
-  var head = '<div class="dbwrap"><div class="dbinfo">当前数据源：<b>'+esc(src)+'</b><br>'
-    + '共 <b>'+list.length+'</b> 条消息记录 · 每条消息都带 <span class="mono">ownerId</span> 归属字段，用于隔离与删除校验。'
-    + (cloud ? '<br>同一集合还存有账号目录与好友关系（<span class="mono">kind=profile / social</span>），供跨设备加好友，不计入聊天消息。' : '')
-    + '</div>';
-  if(!list.length){ box.innerHTML=head+emptyHTML('数据库里还没有记录')+'</div>'; return; }
-  var rows=list.map(function(m){
-    var k=(m.kind||'user');
-    var kc = k==='system'?'system':(k==='ai'?'ai':'');
-    var kn = k==='system'?'系统':(k==='ai'?'AI':'用户');
-    var hasImg = typeof m.image==='string' && m.image.indexOf('data:image/')===0;
-    var att;
-    if(hasImg) att='<img class="zoomable" style="max-width:70px;max-height:48px;border-radius:6px;cursor:zoom-in" src="'+esc(m.image)+'" alt="图片" title="点击查看大图"><div class="mono">image/'+Math.round(m.image.length*0.75/1024)+'KB</div>';
-    else if(m.file && typeof m.file.data==='string' && m.file.data.indexOf('data:')===0)
-      att='<div>📎 '+esc(m.file.name||'')+'</div><div class="mono">file/'+esc(FILE.kb(m.file.size))+'</div>';
-    else if(m.audio && typeof m.audio.data==='string' && m.audio.data.indexOf('data:')===0)
-      att='<div>🎤 语音 '+(m.audio.dur||1)+'″</div><div class="mono">audio/'+esc(FILE.kb(m.audio.bytes))+'</div>';
-    else att='<span style="color:#bbb">—</span>';
-    var scopeCell = m.dm
-      ? '<span class="k" style="background:#fff0e6;color:#c26a20">私聊→'+esc(m.toName||m.toUid||'')+'</span>'
-      : '<span style="color:#bbb">群聊</span>';
-    return '<tr>'
-      +'<td class="mono">'+esc(m.mid||'')+'</td>'
-      +'<td class="mono">'+esc(m.ownerId||'')+'</td>'
-      +'<td>'+esc(m.ownerName||'')+'</td>'
-      +'<td><span class="k '+kc+'">'+kn+'</span></td>'
-      +'<td>'+esc(m.content||'')+'</td>'
-      +'<td>'+att+'</td>'
-      +'<td>'+scopeCell+'</td>'
-      +'<td class="mono">'+esc((m.createdAt||'').replace('T',' ').slice(0,19))+'</td>'
-      +'</tr>';
-  }).join('');
-  box.innerHTML=head+'<table class="dbtab"><thead><tr>'
-    +'<th>mid</th><th>owner_id</th><th>owner_name</th><th>kind</th><th>content</th><th>attachment</th><th>scope</th><th>created_at</th>'
-    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  var box=$('msgs'), cloud=Store.mode==='cloud', tab=state.dbTab||'messages';
+  var src=cloud?'腾讯云云数据库集合「'+CFG.collection+'」':'浏览器本地存储（'+dbBackendName()+'）';
+  var tabs='<div class="db-tabs">'
+    +'<button class="db-tab'+(tab==='messages'?' active':'')+'" data-dbtab="messages">① 消息表</button>'
+    +'<button class="db-tab'+(tab==='users'?' active':'')+'" data-dbtab="users">② 账号表（登录/注册）</button>'
+    +'<button class="db-tab'+(tab==='social'?' active':'')+'" data-dbtab="social">③ 好友关系表</button>'
+    +'</div>';
+  var head='<div class="dbwrap"><div class="dbinfo">当前数据源：<b>'+esc(src)+'</b>'
+    +'　·　共 <b>'+list.length+'</b> 条聊天消息</div>';
+  var body;
+  if(tab==='users'){
+    body=dbUsersHTML(cloud);
+  }else if(tab==='social'){
+    body=dbSocialHTML(cloud);
+  }else{
+    var note='<div class="db-note">这张表存的是<b>聊天消息</b>（群聊 / 私聊 / 图片 / 文件 / 语音 / AI 回复 / 系统公告）。'
+      +'<b>账号密码不在这张表里</b>，请点上方「② 账号表」查看。<br>'
+      +'字段：<code>mid</code> 消息编号 · <code>owner_id</code> 归属者 ID（隔离与删除校验依据） · '
+      +'<code>kind</code> 类型 · <code>content</code> 正文 · <code>attachment</code> 附件 · '
+      +'<code>scope</code> 群聊/私聊 · <code>created_at</code> 时间。'
+      +(cloud?'<br>云端模式下同一集合另有 <code>kind=profile</code> / <code>kind=social</code> 两类辅助记录，已在消息列表里过滤掉，不会显示成气泡。':'')
+      +'</div>';
+    var rows=list.length?list.map(function(m){
+      var k=(m.kind||'user');
+      var kc=k==='system'?'system':(k==='ai'?'ai':'');
+      var kn=k==='system'?'系统':(k==='ai'?'AI':'用户');
+      var hasImg=typeof m.image==='string' && m.image.indexOf('data:image/')===0;
+      var att;
+      if(hasImg) att='<img class="zoomable" style="max-width:70px;max-height:48px;border-radius:6px;cursor:zoom-in" src="'+esc(m.image)+'" alt="图片" title="点击查看大图"><div class="mono">image/'+Math.round(m.image.length*0.75/1024)+'KB</div>';
+      else if(m.file && typeof m.file.data==='string' && m.file.data.indexOf('data:')===0)
+        att='<div>📎 '+esc(m.file.name||'')+'</div><div class="mono">file/'+esc(FILE.kb(m.file.size))+'</div>';
+      else if(m.audio && typeof m.audio.data==='string' && m.audio.data.indexOf('data:')===0)
+        att='<div>🎤 语音 '+(m.audio.dur||1)+'″</div><div class="mono">audio/'+esc(FILE.kb(m.audio.bytes))+'</div>';
+      else att='<span style="color:#bbb">—</span>';
+      var scopeCell=m.dm
+        ? '<span class="k" style="background:#fff0e6;color:#c26a20">私聊→'+esc(m.toName||m.toUid||'')+'</span>'
+        : '<span style="color:#bbb">群聊</span>';
+      return '<tr>'
+        +'<td class="mono">'+esc(m.mid||'')+'</td>'
+        +'<td class="mono">'+esc(m.ownerId||'')+'</td>'
+        +'<td>'+esc(m.ownerName||'')+'</td>'
+        +'<td><span class="k '+kc+'">'+kn+'</span></td>'
+        +'<td>'+esc(m.content||'')+'</td>'
+        +'<td>'+att+'</td>'
+        +'<td>'+scopeCell+'</td>'
+        +'<td class="mono">'+esc((m.createdAt||'').replace('T',' ').slice(0,19))+'</td>'
+        +'</tr>';
+    }).join(''):'';
+    body=note+dbTable('<th>mid</th><th>owner_id</th><th>owner_name</th><th>kind</th><th>content</th><th>attachment</th><th>scope</th><th>created_at</th>',rows,'消息表里还没有记录');
+  }
+  box.innerHTML=tabs+head+body+'</div>';
+  box.querySelectorAll('[data-dbtab]').forEach(function(b){
+    b.addEventListener('click',function(){ state.dbTab=b.getAttribute('data-dbtab'); refresh(); });
+  });
   box.querySelectorAll('.zoomable').forEach(function(im){
     im.addEventListener('click',function(){ openLightbox(im.src); });
   });
@@ -1748,7 +2044,7 @@ function switchScope(scope){
   var descs={
     all:'和群里的小伙伴聊点什么吧 · 可发图片 / 文件 / 语音',
     mine:'这里只有你发过的消息',
-    db:'底层存储的原始记录（编号 / 归属 / 类型 / 附件 / 范围 / 时间）',
+    db:'三张原始表：消息表 / 账号表 / 好友关系表，可直接给老师检查',
     friends:'搜索用户、处理好友申请、发起私聊',
     dm: state.pmPeer ? ('与 '+state.pmPeer.nickname+' 的私密对话 · 群聊大厅看不到') : '私聊'
   };
@@ -1797,8 +2093,16 @@ function loadCloudSDK(cb){
 /* 启动 */
 document.addEventListener('DOMContentLoaded',function(){
   initTheme();
+  initBubble();
   $('btnTheme').addEventListener('click',toggleTheme);
   $('btnThemeEntry').addEventListener('click',toggleTheme);
+  $('btnBubble').addEventListener('click',function(){ toggleBubblePop(); });
+  // 点面板外任意处 / 按 Esc 收起气泡选择面板
+  document.addEventListener('pointerdown',function(e){
+    var w=document.querySelector('.bubble-wrap');
+    if(w && !w.contains(e.target)) closeBubblePop();
+  });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeBubblePop(); });
   $('modalOk').addEventListener('click',function(){ closeModal(true); });
   $('modalCancel').addEventListener('click',function(){ closeModal(false); });
   $('modal').addEventListener('click',function(e){ if(e.target===this) closeModal(false); });
