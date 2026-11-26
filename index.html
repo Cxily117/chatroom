@@ -548,7 +548,7 @@ html[data-theme="dark"][data-bubble="note"] .msg.mine .bubble{
 html[data-bubble="cute-cat"]{--bub-other:#fff8fb;--bub-mine:#ffe9f3;--bub-frame:#ffc9de;--bub-text:#5b4652}
 html[data-bubble="cute-bunny"]{--bub-other:#fff7fb;--bub-mine:#ffe6f2;--bub-frame:#f7b6d3;--bub-text:#5b3f51}
 html[data-bubble="cute-chick"]{--bub-other:#fffbe6;--bub-mine:#fff2b8;--bub-frame:#f2cf62;--bub-text:#5c4a22}
-html[data-bubble="cute-duck"]{--bub-other:#fff7e6;--bub-mine:#ffe9c2;--bub-frame:#f5b95c;--bub-text:#5c4526}
+html[data-bubble="cute-duck"]{--bub-other:#fffdf3;--bub-mine:#fff6df;--bub-frame:#f2d9a0;--bub-text:#6b4f24}
 html[data-bubble="cute-envelope"]{--bub-other:#fffafa;--bub-mine:#fff0f0;--bub-frame:#eaa0a0;--bub-text:#5c3b3b}
 html[data-bubble="cute-monitor"]{--bub-other:#f7f8ff;--bub-mine:#e9ecff;--bub-frame:#8b95b8;--bub-text:#333c5c}
 html[data-bubble="cute-angel"]{--bub-other:#f4fbff;--bub-mine:#e4f3ff;--bub-frame:#a9d3ec;--bub-text:#33556b}
@@ -609,7 +609,26 @@ html[data-bubble="cute-duck"] .bd-ear-l,html[data-bubble="cute-duck"] .bd-ear-r{
   background:rgba(255,255,255,.75)}
 .bd-wing-l{left:-16px;border-radius:70% 12% 70% 12%;transform:rotate(-18deg)}
 .bd-wing-r{right:-16px;border-radius:12% 70% 12% 70%;transform:rotate(18deg)}
-html[data-bubble="cute-chick"] .bubble,html[data-bubble="cute-duck"] .bubble{border-radius:28px 28px 26px 26px}
+html[data-bubble="cute-chick"] .bubble{border-radius:28px 28px 26px 26px}
+/* 水豚噜噜：还原参考图「空白奶油气泡 + 橘子 + 格子胶带 + 双星 + 前方立体水豚」 */
+html[data-theme="dark"][data-bubble="cute-duck"]{--bub-other:#3a3325;--bub-mine:#4a3c26;--bub-frame:#8a7448;--bub-text:#f6e9cd}
+html[data-bubble="cute-duck"] .msg .bubble{border-radius:24px;padding:15px 46px 15px 19px}
+.bd-capy-orange{left:-13px;top:-15px;width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,#ffdd78 0,#ffb02e 52%,#ef8c12 100%);
+  border:1px solid #e99a1c;box-shadow:0 2px 6px rgba(190,115,10,.24)}
+.bd-capy-orange:after{content:"";position:absolute;left:12px;top:-6px;width:5px;height:8px;
+  border-radius:3px 0 3px 0;background:#5faa4f;transform:rotate(-26deg)}
+.bd-capy-tape{right:-12px;top:-11px;width:34px;height:21px;transform:rotate(15deg);
+  border-radius:3px;border:1px solid #e2c367;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.55) 0 1px,transparent 1px 6px),
+             repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 1px,transparent 1px 6px),#f7d97a;
+  box-shadow:0 2px 4px rgba(170,135,20,.2)}
+.bd-capy-star{left:-11px;top:54%;width:20px;height:20px;background:#ffd45e;
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.bd-capy-star2{left:-19px;top:74%;width:14px;height:14px;opacity:.82}
+.bd-capy-face{right:-22px;bottom:-32px;width:84px;height:84px;z-index:5;
+  filter:drop-shadow(0 4px 8px rgba(175,105,15,.3))}
+.bd-capy-face svg{width:100%;height:100%;display:block;overflow:visible}
 html[data-bubble="cute-envelope"] .msg .bubble{border-style:dashed;border-radius:8px}
 html[data-bubble="cute-monitor"] .msg .bubble{border-radius:10px;box-shadow:inset 0 0 0 2px rgba(139,149,184,.18)}
 /* ==================== 装扮面板：改成商城式缩略图网格 ==================== */
@@ -637,6 +656,18 @@ html[data-bubble="cute-monitor"] .msg .bubble{border-radius:10px;box-shadow:inse
   border-bottom:10px solid var(--bp-frame,#ffc9de);z-index:2}
 .bp-preview.bp-cute:before{left:8px}
 .bp-preview.bp-cute:after{left:24px}
+/* 水豚噜噜缩略图：橘子 + 格子胶带 + 小水豚，和其他萌系缩略图区分开 */
+.bp-preview.bp-capy{background:#fffdf3;overflow:visible}
+.bp-preview.bp-capy i,.bp-preview.bp-capy b{background:#fffdf3;border-color:#f2d9a0}
+.bp-preview.bp-capy:before{left:5px;top:4px;width:12px;height:12px;border-radius:50%;
+  border:1px solid #e99a1c;border-bottom:10px solid transparent;
+  background:radial-gradient(circle at 32% 28%,#ffdd78 0,#ffb02e 60%,#ef8c12 100%);z-index:3}
+.bp-preview.bp-capy:after{right:4px;top:1px;width:14px;height:10px;border:1px solid #e2c367;
+  border-radius:2px;background:repeating-linear-gradient(0deg,rgba(255,255,255,.6) 0 1px,transparent 1px 4px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 1px,transparent 1px 4px),#f7d97a;
+  transform:rotate(14deg);z-index:3}
+.bp-mini-capy{position:absolute;right:0;bottom:-8px;width:28px;height:28px;z-index:4;text-decoration:none}
+.bp-mini-capy svg{width:100%;height:100%;display:block;overflow:visible}
 /* ==================== 表情包面板 / 表情消息 ==================== */
 .sticker-wrap{position:relative;display:inline-flex}
 .sticker-pop{position:absolute;bottom:calc(100% + 12px);left:0;width:318px;
@@ -1549,7 +1580,7 @@ var BUBBLE_STYLES=[
   {id:'cute-cat',      name:'拟态小猫',   desc:'猫耳 · 蝴蝶结 · 尾巴', group:'cute',pv:'cute',frame:'#ffc9de',deco:['ear-l','ear-r','tail','bow','blush-l','blush-r']},
   {id:'cute-bunny',    name:'粉白兔',     desc:'长耳朵 · 粉嫩腮红',     group:'cute',pv:'cute',frame:'#f7b6d3',deco:['ear-l','ear-r','blush-l','blush-r','spark']},
   {id:'cute-chick',    name:'尖叫鸡',     desc:'圆滚滚 · 小尖嘴',       group:'cute',pv:'cute',frame:'#f2cf62',deco:['beak','blush-l','blush-r','spark']},
-  {id:'cute-duck',     name:'水豚噜噜',   desc:'橘黄 · 小揪揪',         group:'cute',pv:'cute',frame:'#f5b95c',deco:['ear-l','ear-r','bow','blush-l','blush-r']},
+  {id:'cute-duck',     name:'水豚噜噜',   desc:'橘子 · 格子胶带 · 小星', group:'cute',pv:'capy',frame:'#f2d9a0',deco:['capy-orange','capy-tape','capy-star','capy-star2','capy-face']},
   {id:'cute-envelope', name:'心室信封',   desc:'虚线边 · 小邮票',       group:'cute',pv:'cute',frame:'#eaa0a0',deco:['stamp','seal','spark']},
   {id:'cute-monitor',  name:'电子显示器', desc:'屏幕框 · 小底座',       group:'cute',pv:'cute',frame:'#8b95b8',deco:['stand','dot']},
   {id:'cute-angel',    name:'十字蓝天使', desc:'翅膀 · 星星',           group:'cute',pv:'cute',frame:'#a9d3ec',deco:['wing-l','wing-r','spark','spark2']},
@@ -1557,6 +1588,22 @@ var BUBBLE_STYLES=[
 ];
 var CUTE_DECO={};
 BUBBLE_STYLES.forEach(function(s){ if(s.group==='cute') CUTE_DECO[s.id]=s.deco; });
+/* 水豚噜噜本体：不用 <defs>/id，避免每条消息重复定义同 id 造成渲染串色 */
+var CAPY_FACE_SVG='<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+  +'<ellipse cx="50" cy="82" rx="30" ry="18" fill="#f7a42c"/>'
+  +'<circle cx="25" cy="36" r="9" fill="#f0a02a"/><circle cx="75" cy="36" r="9" fill="#f0a02a"/>'
+  +'<circle cx="25" cy="36" r="4.4" fill="#ffd08a"/><circle cx="75" cy="36" r="4.4" fill="#ffd08a"/>'
+  +'<ellipse cx="50" cy="58" rx="38" ry="30" fill="#ffc04a" stroke="#e89418" stroke-width="1.2"/>'
+  +'<ellipse cx="36" cy="47" rx="15" ry="9" fill="#ffe4a8" opacity=".45"/>'
+  +'<circle cx="50" cy="25" r="7" fill="#ffc94a" stroke="#e89418" stroke-width="1"/>'
+  +'<path d="M50 19q3-7 9-6-4 5-9 6z" fill="#62a94f"/>'
+  +'<ellipse cx="36" cy="53" rx="3.4" ry="4" fill="#2b211a"/><ellipse cx="64" cy="53" rx="3.4" ry="4" fill="#2b211a"/>'
+  +'<circle cx="35" cy="51.4" r="1.1" fill="#fff"/><circle cx="63" cy="51.4" r="1.1" fill="#fff"/>'
+  +'<ellipse cx="23" cy="64" rx="6" ry="3" fill="#ff7b52" opacity=".3"/>'
+  +'<ellipse cx="77" cy="64" rx="6" ry="3" fill="#ff7b52" opacity=".3"/>'
+  +'<ellipse cx="50" cy="67" rx="5.5" ry="3" fill="#3a2a1e"/>'
+  +'<path d="M46 73q4 4 8 0" fill="none" stroke="#3a2a1e" stroke-width="1.6" stroke-linecap="round"/>'
+  +'</svg>';
 function bubbleStyle(){
   var v=document.documentElement.getAttribute('data-bubble');
   return BUBBLE_STYLES.some(function(s){ return s.id===v; })?v:'classic';
@@ -1566,6 +1613,7 @@ function cuteDeco(){
   if(!d) return '';
   return d.map(function(x){
     var txt=(x==='spark'||x==='spark2')?'✦':'';
+    if(x==='capy-face') txt=CAPY_FACE_SVG;
     return '<span class="bd bd-'+x+'">'+txt+'</span>';
   }).join('');
 }
@@ -1593,8 +1641,10 @@ function initBubble(){
 function bpCard(s){
   var cute=s.group==='cute';
   var st=cute?(' style="--bp-frame:'+s.frame+'"'):'';
+  var pv='<span class="bp-preview bp-'+s.pv+(cute?' bp-cute':'')+'"'+st+'><i></i><b></b>'
+    +(s.id==='cute-duck'?'<u class="bp-mini-capy">'+CAPY_FACE_SVG+'</u>':'')+'</span>';
   return '<button class="bp-item" type="button" data-bp="'+s.id+'" role="menuitem">'
-    +'<span class="bp-preview bp-'+s.pv+(cute?' bp-cute':'')+'"'+st+'><i></i><b></b></span>'
+    +pv
     +'<span class="bp-text"><span class="bp-name">'+esc(s.name)+'</span>'
     +'<span class="bp-desc">'+esc(s.desc)+'</span></span>'
     +'<svg class="ic bp-check"><use href="#i-check"></use></svg></button>';
