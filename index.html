@@ -1086,7 +1086,7 @@ window.CHAT_CONFIG = {
       </button>
     </div></header>
     <div class="msgs" id="msgs"></div>
-    <div class="composer">
+    <div class="composer" id="composer">
       <div class="tip" id="tip"></div>
       <div class="toolbar">
         <button class="imgbtn" id="btnImg" title="发送图片（自动压缩）"><svg class="ic"><use href="#i-image"></use></svg><span>图片</span></button>
@@ -3206,6 +3206,8 @@ function switchScope(scope){
   var petVisible = $('aiPet').style.display !== 'none';   // 是否未被手动收起
   $('aiPet').style.display = petShow && petVisible ? 'flex' : 'none';
   $('petRestore').style.display = petShow && !petVisible ? 'block' : 'none';
+  // 底部发送框：好友 / 数据库 / 网络抓包三个面板里没有"发消息"的场景，直接隐藏
+  $('composer').style.display = (scope==='friends' || scope==='db' || scope==='net') ? 'none' : '';
   $('chatTitle').textContent = titles[scope]||'群聊大厅';
   $('chatDesc').textContent = descs[scope]||'';
   var mb=$('msgs'); mb.classList.remove('swap'); void mb.offsetWidth; mb.classList.add('swap');
