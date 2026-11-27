@@ -25,7 +25,12 @@ const path = require('path');
 
 const PORT = parseInt(process.env.PORT || '80', 10);
 const COLLECTION = process.env.COLLECTION || 'chat_messages';
-const DRIVER = process.env.DB_DRIVER || (process.env.TCB_ENV ? 'cloudbase' : 'file');
+const DRIVER_RAW = process.env.DB_DRIVER || (process.env.TCB_ENV ? 'cloudbase' : 'file');
+// 云驱动必须有 TCB_ENV，否则读写会静默失败（注册/发消息直接 500），自动回退文件模式并告警
+const DRIVER = DRIVER_RAW === 'cloudbase' && !process.env.TCB_ENV ? 'file' : DRIVER_RAW;
+if (DRIVER_RAW === 'cloudbase' && DRIVER === 'file') {
+  console.warn('[警告] 未配置 TCB_ENV，已从云数据库回退到本地文件模式（容器重启后数据会丢失）');
+}
 const ALLOW_ORIGIN = process.env.ALLOW_ORIGIN || '*';
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'chatroom-demo-secret';
 const TOKEN_TTL_MS = 30 * 24 * 3600 * 1000;   // 30 天

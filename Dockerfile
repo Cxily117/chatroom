@@ -22,8 +22,9 @@ COPY index.html ./public/index.html
 
 # 分开写，避免续行符在不同换行风格下解析出错
 ENV PORT=80
-ENV DB_DRIVER=cloudbase
 ENV COLLECTION=chat_messages
+# DB_DRIVER 不写死：后端根据你是否配置 TCB_ENV 自动选择 cloudbase / file，
+# 避免忘记配 TCB_ENV 时云数据库读写静默失败（云托管控制台设 TCB_ENV 即可）。
 
 EXPOSE 80
 
