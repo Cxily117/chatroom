@@ -133,7 +133,15 @@ function cloudbaseDriver() {
     if (process.env.SESSIONTOKEN) opts.sessionToken = process.env.SESSIONTOKEN;
   }
   const app = tcb.init(opts);
-  const col = app.database().collection(COLLECTION);
+  const db = app.database();
+  const col = db.collection(COLLECTION);
+  // 集合不存在时 RESOURCE_NOT_FOUND 会让所有读写失败，启动时自动补建（已存在则忽略报错）
+  db.createCollection(COLLECTION).catch((e) => {
+    const msg = (e && (e.message || e.code)) || '';
+    if (!/exist|RESOURCE_NOT_FOUND|not ?found/i.test(msg)) {
+      console.error('[cloudbase] 自动创建集合失败：', msg);
+    }
+  });
   return {
     name: 'cloudbase',
     env: process.env.TCB_ENV,
