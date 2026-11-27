@@ -137,9 +137,11 @@ function cloudbaseDriver() {
   const col = db.collection(COLLECTION);
   // 集合不存在时 RESOURCE_NOT_FOUND 会让所有读写失败，启动时自动补建（已存在则忽略报错）
   db.createCollection(COLLECTION).catch((e) => {
-    const msg = (e && (e.message || e.code)) || '';
-    if (!/exist|RESOURCE_NOT_FOUND|not ?found/i.test(msg)) {
-      console.error('[cloudbase] 自动创建集合失败：', msg);
+    const msg = (e && (e.message || e.code)) || String(e);
+    if (/already ?exist/i.test(msg)) {
+      console.log('[cloudbase] 集合', COLLECTION, '已存在，跳过创建');
+    } else {
+      console.error('[cloudbase] 自动创建集合失败：', msg, '| code:', e && e.code);
     }
   });
   return {
