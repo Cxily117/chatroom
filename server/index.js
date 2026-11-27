@@ -542,6 +542,8 @@ async function main() {
     console.log('  存储驱动 :', driver.name + (driver.file ? ' -> ' + driver.file : ''));
     console.log('  集合     :', COLLECTION);
     console.log('  前端目录 :', WEB_ROOT, fs.existsSync(path.join(WEB_ROOT, 'index.html')) ? '(已托管)' : '(缺少 index.html，仅提供 API)');
+    const sid = process.env.SECRETID || '';
+    console.log('  云库凭证 :', sid ? 'SECRETID/SECRETKEY 已注入 (' + sid.slice(0, 10) + '...)' : '【缺失】SECRETID/SECRETKEY 环境变量不存在，数据库读写会挂起！');
     console.log('  账号数   :', Object.keys(state.users).length, ' 消息数:', state.messages.length);
   });
 }
