@@ -3192,6 +3192,11 @@ function switchScope(scope){
     friends:'搜索用户、处理好友申请、发起私聊',
     dm: state.pmPeer ? ('与 '+state.pmPeer.nickname+' 的私密对话 · 群聊大厅看不到') : '私聊'
   };
+  // 悬浮小星只在「群聊大厅 / 个人」出现（@小星 互动发生在聊天视图），其余面板隐藏
+  var petShow = (scope==='all' || scope==='mine');
+  var petVisible = $('aiPet').style.display !== 'none';   // 是否未被手动收起
+  $('aiPet').style.display = petShow && petVisible ? 'flex' : 'none';
+  $('petRestore').style.display = petShow && !petVisible ? 'block' : 'none';
   $('chatTitle').textContent = titles[scope]||'群聊大厅';
   $('chatDesc').textContent = descs[scope]||'';
   var mb=$('msgs'); mb.classList.remove('swap'); void mb.offsetWidth; mb.classList.add('swap');
