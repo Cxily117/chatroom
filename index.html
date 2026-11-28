@@ -1869,30 +1869,40 @@ var AI = {
       '嗯…让我想想。要不先问问「这个聊天室用了哪些 HTTP 接口」？这个我可熟了。'
     ]);
   },
-  // 统一入口：返回 Promise<string>。云端可用时调扣子，否则回退本地规则。
-  // history：最近的对话轮次 [{role:'user'|'assistant', content}]，让扣子"记得"前文
+  // 统一入口：返回 Promise<string>。三层自动降级：
+  //   ① 后端 /api/ai（云托管同源，服务端配了免费大模型 Key 就能用，密钥不下发浏览器）
+  //   ② 原扣子云函数 CFG.aiProxyUrl（若其恢复服务）
+  //   ③ 本地规则兜底（离线可用，永远有回答）
+  // history：最近的对话轮次 [{role:'user'|'assistant', content}]
   answer:function(q, userId, history){
     var self=this, text=String(q||'');
-    if(!CFG.aiProxyUrl) return Promise.resolve(self.localAnswer(text));
-    var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, CFG.aiTimeoutMs||40000) : null;
-    var opts = {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ question:text, userId:userId||'guest', history:history||[] })
-    };
-    if(ctrl) opts.signal=ctrl.signal;
-    return fetch(CFG.aiProxyUrl, opts)
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if(d && d.ok && d.answer) return String(d.answer);
-        throw new Error((d && d.error) || '云端未返回答案');
-      })
-      .catch(function(e){
-        console.warn('云端 AI 不可用，降级本地规则：', e && e.message);
-        return self.localAnswer(text);
-      })
-      .then(function(ans){ if(timer) clearTimeout(timer); return ans; });
+    var payload={ question:text, userId:userId||'guest', history:history||[] };
+    var body=JSON.stringify(payload);
+
+    function call(url, timeoutMs){
+      var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+      var timer=ctrl?setTimeout(function(){ctrl.abort();},timeoutMs):null;
+      var opt={method:'POST',headers:{'Content-Type':'application/json'},body:body};
+      if(ctrl) opt.signal=ctrl.signal;
+      return fetch(url,opt)
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if(d && d.ok && d.answer) return String(d.answer);
+          throw new Error((d && d.error)||'未返回答案');
+        })
+        .then(function(ans){ if(timer)clearTimeout(timer); return ans; },function(e){ if(timer)clearTimeout(timer); throw e; });
+    }
+
+    var local=function(e){ console.warn('AI 云端均不可用，降级本地规则：',e&&e.message); return self.localAnswer(text); };
+    // ① 后端同源接口：apiBase 为空时 relative '/api/ai' 自动走当前域名（云托管单服务）
+    var backend='/api/ai';
+    return call(backend, 28000).catch(function(e1){
+      // ② 扣子云函数（若配置了且后端没成功）
+      if(!CFG.aiProxyUrl) throw e1;
+      return call(CFG.aiProxyUrl, CFG.aiTimeoutMs||40000).catch(function(e2){
+        throw new Error('后端与云函数均失败：'+(e1&&e1.message)+' / '+(e2&&e2.message));
+      });
+    }).catch(local);
   }
 };
 

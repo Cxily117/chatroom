@@ -520,6 +520,53 @@ app.use(express.static(WEB_ROOT, {
   }
 }));
 
+/* 免费 AI 代理：兼容 OpenAI chat/completions 的免费大模型（智谱 GLM-4-Flash / 硅基流动等）。
+   环境变量：AI_API_KEY（必填，服务端密钥，绝不下发前端）、AI_BASE_URL、AI_MODEL。
+   未配置 AI_API_KEY 时明确失败，前端会自动退回原扣子云函数 / 本地规则，不影响其他功能。 */
+const AI_KEY = process.env.AI_API_KEY || '';
+const AI_BASE = (process.env.AI_BASE_URL || 'https://open.bigmodel.cn/api/paas/v4').replace(/\/+$/, '');
+const AI_MODEL = process.env.AI_MODEL || 'glm-4-flash';
+const AI_SYSTEM = '你是「小星」，星火聊天室（计算机网络课程大作业）的智能助手，语气热情亲切、简短口语化。'
+  + '项目背景：前端单文件 index.html + Express 后端（云托管同源部署）+ 腾讯云开发文档数据库；'
+  + '9 类 RESTful 接口；GET /api/health 探测后端，不通则降级本地存储；HMAC-SHA256 令牌鉴权；'
+  + 'owner_id 归属隔离；60 秒 8 条滑动窗口限流。'
+  + '回答紧扣这个项目，控制在 3 句话以内，不要输出 markdown 标题。';
+
+app.post('/api/ai', async (req, res) => {
+  if (!AI_KEY) return fail(res, 503, '服务端未配置 AI_API_KEY');
+  const question = String((req.body && req.body.question) || '').trim();
+  if (!question) return fail(res, 400, '问题为空');
+  const history = Array.isArray(req.body.history) ? req.body.history.slice(-12) : [];
+  const messages = [{ role: 'system', content: AI_SYSTEM }];
+  history.forEach((h) => {
+    if (!h || !h.content) return;
+    messages.push({ role: h.role === 'assistant' ? 'assistant' : 'user', content: String(h.content).slice(0, 300) });
+  });
+  messages.push({ role: 'user', content: question });
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 25000);
+  try {
+    const r = await fetch(AI_BASE + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + AI_KEY },
+      body: JSON.stringify({ model: AI_MODEL, messages, temperature: 0.7, max_tokens: 400 }),
+      signal: ctrl.signal
+    });
+    const text = await r.text();
+    let data;
+    try { data = JSON.parse(text); } catch (_) { throw new Error('模型返回非 JSON：' + text.slice(0, 120)); }
+    if (!r.ok) throw new Error('模型 HTTP ' + r.status + '：' + JSON.stringify(data).slice(0, 160));
+    const answer = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (!answer) throw new Error('模型返回空答案：' + JSON.stringify(data).slice(0, 160));
+    ok(res, { answer: String(answer).trim() });
+  } catch (e) {
+    fail(res, 502, '免费模型调用失败：' + ((e && e.message) || '未知错误'));
+  } finally {
+    clearTimeout(timer);
+  }
+});
+
 app.use('/api', (req, res) => fail(res, 404, '接口不存在：' + req.method + ' ' + req.originalUrl));
 
 // 其余路径回到首页（前端是单页应用）
