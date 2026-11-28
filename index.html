@@ -1432,17 +1432,26 @@ var Api = {
     var self=this;
     return this.get('/api/sync').then(function(j){ self.absorb(j); return j; });
   },
-  /* 探测后端是否在线，决定这一轮走 API 还是退回本地 */
+  /* 探测后端是否在线，决定这一轮走 API 还是退回本地。
+     云托管「最小实例 0」时服务会休眠，首次请求会撞上冷启动（网关报错/超时），
+     因此失败后自动等待重试最多 2 次（共约 8s），唤醒后即可正常进入后端模式。 */
   boot:function(){
     var self=this;
     self.base=CFG.apiBase;
     self.loadToken();
-    return fetch(self.url('/api/health'),{method:'GET'}).then(function(r){ return r.json(); })
-      .then(function(j){
-        if(!j || j.ok!==true) throw new Error('health 异常');
-        self.on=true;
-        return j;
-      });
+    function tryOnce(){
+      return fetch(self.url('/api/health'),{method:'GET'}).then(function(r){ return r.json(); })
+        .then(function(j){
+          if(!j || j.ok!==true) throw new Error('health 异常');
+          self.on=true;
+          return j;
+        });
+    }
+    function wait(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
+    return tryOnce()
+      .catch(function(){ return wait(2500).then(tryOnce); })
+      .catch(function(){ return wait(4000).then(tryOnce); })
+      .catch(function(e){ console.warn('后端探测失败（已重试 2 次），退回本地模式：', e && e.message); throw e; });
   }
 };
 
