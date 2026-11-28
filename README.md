@@ -61,7 +61,7 @@ flowchart TB
 **方式 C 部署要点**：
 1. 云开发控制台 → 云托管 → 新建服务，仓库指向本仓库，**目标目录填 `.`（仓库根）**，端口 80。
 2. 环境变量：`TCB_ENV=你的环境ID`（**必填**，不填会自动退回文件模式且重启丢数据）、`TOKEN_SECRET=随机串`。`DB_DRIVER` 不用配，后端看到 `TCB_ENV` 会自动用云数据库。
-3. `index.html` 顶部 `CHAT_CONFIG.apiBase` 保持留空（自动探测同源 `/api/health`）。
+3. `index.html` 顶部 `CHAT_CONFIG.apiBase` 保持留空（自动探测同源 `/api/health`）；`fallbackApiBase` 预填线上域名，本地双击打开时自动连它作备用。
 4. 打开服务域名，右上角徽章显示 🌐 后端 API 即成功。
 
 详细步骤见 [`docs/云托管部署指南.md`](docs/云托管部署指南.md)，接口清单见 [`docs/后端接口文档.md`](docs/后端接口文档.md)。

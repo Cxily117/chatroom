@@ -945,6 +945,7 @@ html[data-bubble] .msg.mine .bubble.sticker-bub{background:transparent;border:no
 /* 如需接云端：把下面 env 改成你的腾讯云环境 ID；留空 = 本地存储模式（也能完整体验） */
 window.CHAT_CONFIG = {
   apiBase: '',             // 留空 = 自动用同源 /api（云托管单服务部署即如此，无需填写）；跨域部署才填后端域名
+  fallbackApiBase: 'https://chatroom-344249-9-1410426812.sh.run.tcloudbase.com',  // 备用线上后端：同源探测不到时（如本地双击打开本文件）自动连它
   env: '',                 // 例：'chatroom-1g8abcd1234'
   collection: 'chat_messages',
   rateWindowMs: 60000,     // 限流窗口：60 秒
@@ -1433,11 +1434,11 @@ var Api = {
     return this.get('/api/sync').then(function(j){ self.absorb(j); return j; });
   },
   /* 探测后端是否在线，决定这一轮走 API 还是退回本地。
+     探测地址由 Store.init 按队列设置（同源优先 → 备用线上地址）；
      云托管「最小实例 0」时服务会休眠，首次请求会撞上冷启动（网关报错/超时），
      因此失败后自动等待重试最多 2 次（共约 8s），唤醒后即可正常进入后端模式。 */
   boot:function(){
     var self=this;
-    self.base=CFG.apiBase;
     self.loadToken();
     function tryOnce(){
       return fetch(self.url('/api/health'),{method:'GET'}).then(function(r){ return r.json(); })
@@ -1636,12 +1637,6 @@ var Store = {
     var self=this;
     // 同源部署：页面和 API 由同一个服务提供时（云托管单服务 / 本地 node server），
     // 自动探测本域名的 /api/health，通了就走后端，不用填 apiBase。
-    function useApi(){
-      return Api.boot().then(function(){
-        self.mode='api'; self.reason='';
-        return Api.sync();                       // 先拉一次全量，账号目录/好友关系/消息都到手
-      });
-    }
     function fallback(){
       if(!CFG.env){ self.reason='未填写环境 ID'; self.mode='local'; return Promise.resolve(); }
       if(typeof window.cloudbase==='undefined'){
@@ -1665,21 +1660,36 @@ var Store = {
       }
       return Promise.resolve();
     }
-    if(CFG.apiBase){
-      return useApi().catch(function(e){
-        self.reason='后端不可达：'+((e&&e.message)||e);
-        self.mode='local';
-        console.warn('后端不可用，退回本地模式：',e);
-      });
-    }
-    // 只有 http(s) 打开才谈得上同源；file:// 直接走云端/本地
-    if(location.protocol==='http:' || location.protocol==='https:'){
-      return useApi().catch(function(e){
-        console.log('同源未提供 /api（正常现象，走云端或本地）：', e && e.message);
+    // 探测队列：显式 apiBase 优先 → 同源（仅 http/https）→ 备用线上地址。
+    // file:// 双击打开本文件时同源不可用，会自动尝试 fallbackApiBase 连接已部署的线上后端，
+    // 保证仓库/交付包直接双击也能进入「后端 API 模式」。
+    var probes=[];
+    if(CFG.apiBase) probes.push(CFG.apiBase);
+    if(location.protocol==='http:' || location.protocol==='https:') probes.push('');
+    if(CFG.fallbackApiBase && probes.indexOf(CFG.fallbackApiBase)<0) probes.push(CFG.fallbackApiBase);
+    var probeIdx=0;
+    function probeNext(lastErr){
+      if(probeIdx>=probes.length){
+        if(CFG.apiBase){
+          self.reason='后端不可达：'+((lastErr&&lastErr.message)||lastErr);
+          self.mode='local';
+          console.warn('后端不可用，退回本地模式：', lastErr);
+          return Promise.resolve();
+        }
+        console.log('各地址探测均失败，走云端/本地兜底：', lastErr && lastErr.message);
         return fallback();
+      }
+      var base=probes[probeIdx++];
+      Api.base=base;
+      return Api.boot().then(function(){
+        self.mode='api'; self.reason='';
+        return Api.sync();
+      }).catch(function(e){
+        console.log('探测 '+(base||'同源 /api')+' 失败：', e && e.message);
+        return probeNext(e);
       });
     }
-    return fallback();
+    return probeNext();
   },
   list:function(){
     if(this.mode==='api'){
